@@ -17,8 +17,10 @@ logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /       
 
 version ="0.0.1a"
 
-algos = ["base64", "base32", "hex (hexadecimal), md5", "bi (binaryimage)"]
-
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor"]
+non_cript_algos = ["x0r", "xor", "md5"]
+raw_input = 0
+file_input = 1
 
 encodings = ["UTF-8", "ASCII", "BIG5", "johab"]
 
@@ -33,17 +35,75 @@ def checkEncDec():
     if (args.encrypt) and (args.decrypt):
         print("ERROR: Please select either encryption or decryption method")
         sys.exit()
-    if (args.encrypt==0) and (args.decrypt==0) and not (args.input==None) and not (args.version) and not (args.logo) and (args.list==None):
+    if (args.encrypt==0) and (args.decrypt==0) and not (args.input==None) and not (args.version) and not (args.logo) and (args.list==None) and not args.algorithm in non_cript_algos:
         print("Please specify if you want to encrypt or decrypt ('--encrypt/--decrypt' or '-E/-D')")
         sys.exit()
     print("\n")
 
+def checkInput():
+    if args.input == None or len(args.input) == 0:
+        print("Please specify an input with -i")
+        sys.exit()
 
+######### Utils
+
+class Utils:
+
+    def getBinaryInput():
+        if args.type == raw_input:
+            return Utils.getBinaryFromAscii(args.input)
+        elif args.type == file_input:
+            return utils.getBinaryFromAscii(open(args.input, "r").read())
+        else:
+            print("Unknown input type: " + args.type)
+            sys.exit();
+
+    def getBinaryFromAscii(inp):#If inp is binary, returns itsself, otherwise converts it to binary from ascii
+        binary = inp
+        is_binary = True
+        for char in binary:
+            if char not in ["0", "1", " "]:
+                is_binary = False
+                break;
+        if not is_binary:
+            ascii_binary = ""
+            for char in binary:
+                bin_char = bin(int.from_bytes(char.encode(), 'big'))
+                bin_char = bin_char[2:len(bin_char)]
+                for i in range(8 - len(bin_char)):
+                    ascii_binary += "0"
+                ascii_binary += bin_char
+            binary = ascii_binary
+        return binary
+
+    def getAsciiFromBinary(inp):
+        out = ""
+        for i in range(int(len(inp) / 8)):
+            n = int(inp[i*8:(i+1)*8], 2)
+            out += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode()
+        return out
+
+    def printBinaryAscii(bin_input):
+        print("Binary Output:")
+        print(bin_input)
+        print("\n")
+        print("Ascii Output:")
+        print(Utils.getAsciiFromBinary(bin_input))
+
+    def openTempAsciiFile(bin_input):
+        import os, time
+        file = open("output.txt", "w")
+        file.write(Utils.getAsciiFromBinary(bin_input))
+        file.close()
+        os.startfile("output.txt")
+        time.sleep(1)
+        os.remove("output.txt")
 
 ######### Command-Line Arguments
 
 
 MyArgsDesc = logo
+utils = Utils
 
 parser = argparse.ArgumentParser(description="           xXB3schdl_CryptXx \n\n Note, that all Arguments with a double Dash ('--') don't require an aditional input, all with one dash ('-') require one.")
 
@@ -67,14 +127,20 @@ parser.add_argument('-input', '-i',
                    help="Input the name here",
                    )
 
+parser.add_argument('-key', '-k',
+                   help="The key, if needed"
+)
+
 parser.add_argument('-output', '-o',
                     help="This will be the output"
                     )
 
 args = parser.parse_args()
 
-if (args.encoding==None):
+if args.encoding==None:
     args.encoding="ASCII"
+if args.type==None:
+    args.type=raw_input
 
 
 
@@ -95,6 +161,7 @@ elif not (args.list==None):
     print("You did not select a valid list")
 
 checkEncDec()
+checkInput()
 
 if (args.logo):
     print(logo)
@@ -177,9 +244,6 @@ class Algorithms:
                 globals()["PIL"] = importlib.import_module("PIL")
 
             from PIL import Image
-            if args.input == None or len(args.input) == 0:
-                    print("Please specify an input with -i")
-                    return
             if(args.decrypt):
                 try:
                     im = Image.open(args.input)
@@ -200,15 +264,8 @@ class Algorithms:
                             pix_white = False
                         if pix_white: binary_output += "0"
                         else: binary_output += "1"
-                print("Binary Output:")
-                print(binary_output)
-                ascii_output = ""
-                for i in range(int(len(binary_output) / 8)):
-                    n = int(binary_output[i*8:(i+1)*8], 2)
-                    ascii_output += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode()
-                print("\n")
-                print("Ascii Output:")
-                print(ascii_output)
+                utils.printBinaryAscii(binary_output)
+
 
 
             if(args.encrypt):
@@ -216,22 +273,7 @@ class Algorithms:
                     print("Please specify an output with -o")
                     return
                 import math
-                binary = args.input
-                is_binary = True
-                for char in binary:
-                    if char not in ["0", "1", " "]:
-                        is_binary = False
-                        break;
-                if not is_binary:
-                    ascii_binary = ""
-                    for char in binary:
-                        bin_char = bin(int.from_bytes(char.encode(), 'big'))
-                        bin_char = bin_char[2:len(bin_char)]
-                        for i in range(8 - len(bin_char)):
-                            ascii_binary += "0"
-                        ascii_binary += bin_char
-                    binary = ascii_binary
-                binary = "".join(binary.split(" "))
+                binary = "".join(utils.getBinaryInput().split(" "))
                 size = math.ceil(math.sqrt(len(binary)))
                 im = Image.new("RGB", (size, size))
                 pix = im.load()
@@ -256,9 +298,38 @@ class Algorithms:
                 encDecErr()
             print(out)
 
+    class KeyEncryptions:
+
+        ###X0R
+
+        def x0r():
+            print(args.input)
+            data = utils.getBinaryInput()
+            if args.key == None:
+                print("There was no key specified")
+                return;
+            data = utils.getBinaryInput()
+            if args.type == raw_input:
+                key = Utils.getBinaryFromAscii(args.key)
+            elif args.type == file_input:
+                key = utils.getBinaryFromAscii(open(args.key, "r").read())
+            key = utils.getBinaryFromAscii(args.key)
+            original_key = key
+            while len(key) < len(data): key += original_key
+            binary_output = ""
+            for i in range(len(data)):
+                is_1 = data[i] != key[i]
+                if(is_1): binary_output += "1"
+                else: binary_output += "0"
+            utils.printBinaryAscii(binary_output)
+            if args.type == file_input:
+                utils.openTempAsciiFile(binary_output)
+
+
 a = Algorithms
 n = a.NonKeyEncryptions
 o = a.OneWayFunctions
+k = a.KeyEncryptions
 
 
 ###### This is the guy that switches between the functions
@@ -278,6 +349,8 @@ elif (args.algorithm=="md5") or (args.algorithm=="MessageDigest5"):
     o.md5()
 elif (args.algorithm=="bi") or (args.algorithm=="binaryimage"):
     n.binaryimage()
+elif (args.algorithm=="xor") or (args.algorithm=="x0r"):
+    k.x0r()
 elif not (args.algorithm==None):
     print("Your algorithm is not valid, get a list of algorithms with 'Beschdlcrypt.py -list algorithms'; Did you type it wrong?")
 
@@ -290,3 +363,4 @@ class Convert:
         else:
             print ("ERROR: Please enter a valid string")
             sys.exit()
+
