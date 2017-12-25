@@ -2,27 +2,108 @@ import sys
 import argparse
 import binascii
 import hashlib
+import math
+import importlib
+import urllib.request
 from binascii import b2a_hex
-from binascii import a2b_hex
 from base64 import b64decode, b64encode
+from binascii import a2b_hex
 from base64 import b32decode, b32encode
-from math import exp, factorial, log, log10, log2, pi
+
+def tryimport():
+            try:
+                import PIL
+            except ImportError:
+                try:
+                    import pip
+                except ImportError:
+                    print("Pip not installed. Installing")
+                    try:
+                        exec(pip_install_script = urllib.request.urlopen("https://bootstrap.pypa.io/get-pip.py").read())
+                    except URLError:
+                        print("Unable to connect to server")
+                print("Pillow not installed. Installing")
+                pip.main(['install', "Pillow"])
+                globals()["PIL"] = importlib.import_module("PIL")
+
+                
+                ##### Utils
+
+
+class Utils:
+
+    def getBinaryInput():
+        if args.type == raw_input:
+            return Utils.getBinaryFromAscii(args.input)
+        elif args.type == file_input:
+            return utils.getBinaryFromAscii(open(args.input, "r").read())
+        else:
+            print("Unknown input type: " + args.type)
+            sys.exit();
+
+    def getBinaryFromAscii(inp):#If inp is binary, returns itsself, otherwise converts it to binary from ascii
+        binary = inp
+        is_binary = True
+        for char in binary:
+            if char not in ["0", "1", " "]:
+                is_binary = False
+                break;
+        if not is_binary:
+            ascii_binary = ""
+            for char in binary:
+                bin_char = bin(int.from_bytes(char.encode(), 'big'))
+                bin_char = bin_char[2:len(bin_char)]
+                for i in range(8 - len(bin_char)):
+                    ascii_binary += "0"
+                ascii_binary += bin_char
+            binary = ascii_binary
+        return binary
+
+    def getAsciiFromBinary(inp):
+        out = ""
+        for i in range(int(len(inp) / 8)):
+            n = int(inp[i*8:(i+1)*8], 2)
+            out += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode()
+        return out
+
+    def printBinaryAscii(bin_input):
+        print("Binary Output:")
+        print(bin_input)
+        print("\n")
+        print("Ascii Output:")
+        print(Utils.getAsciiFromBinary(bin_input))
+
+    def openTempAsciiFile(bin_input):
+        import os, time
+        file = open("output.txt", "w")
+        file.write(Utils.getAsciiFromBinary(bin_input))
+        file.close()
+        os.startfile("output.txt")
+        time.sleep(1)
+        os.remove("output.txt")
+
+utils = Utils        
+
 ########## A free line
 if len(sys.argv) != 1:
     print("\n")
+    
+    
+
 ########## Variables
 
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 
-version ="0.0.1a"
-
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor"]
+version ="0.0.5a"
+lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary"]
 aliases =   {
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
             "binaryimage": "bi",
-            "xor": "x0r"
+            "xor": "x0r",
+            "binary": "bin"
             }
 non_cript_algos = ["x0r", "xor", "md5"]
 raw_input = 0
@@ -36,31 +117,31 @@ helpinfo = {
             "hex": "Converts hex to text, and text to hex",
             "md5": "Message Digest 5 (MD5) is a hash function used in cryptography. Developed by Ronald Rivest in 1991, Message Digest 5 produces a 128-bit resulting hash value. Similar to other message-digest algorithms, it was largely developed for digital signature applications which make use of a large compressed file in a secure fashion.",
             "bi": "BinaryImage is used to convert images to binary, and binary to images. It does so be cycling through each binary value, and placing a black pixel if the value is '1', and a white if '0'",
-            "x0r": "X0r is a cipher, that converts the input to binary, and the key to binary, then goes through each value of the input XORing each value. Note if the key is shorter than the input, it will be looped."
+            "x0r": "X0r is a cipher, that converts the input to binary, and the key to binary, then goes through each value of the input XORing each value. Note if the key is shorter than the input, it will be looped.",
+            "binary": "Converts the input to binary and vice versa"
             }
-
-
 
 ######### Error functions
 
 def encDecErr():
-    output("ERROR: Something went wrong, check your settings or try again")
+    print("ERROR: Something went wrong, check your settings or try again")
     if (args.input==None):
-        output("It seems like you didn't specify any input ('--input')")
+        print("It seems like you didn't specify any input ('--input')")
 
 def checkEncDec():
     if (args.encrypt) and (args.decrypt):
-        output("ERROR: Please select either encryption or decryption method")
+        print("ERROR: Please select either encryption or decryption method")
         sys.exit()
     if (args.encrypt==0) and (args.decrypt==0) and not (args.input==None) and not (args.version) and not (args.logo) and (args.list==None) and not args.algorithm in non_cript_algos:
-        output("Please specify if you want to encrypt or decrypt ('--encrypt/--decrypt' or '-E/-D')")
+        print("Please specify if you want to encrypt or decrypt ('--encrypt/--decrypt' or '-E/-D')")
         sys.exit()
-    output("\n")
+    print("\n")
 
 def checkInput():
     if args.input == None or len(args.input) == 0:
-        output("Please specify an input with -i")
+        print("Please specify an input with -i")
         sys.exit()
+
 
 ######### Command-Line Arguments
 
@@ -73,9 +154,9 @@ parser = argparse.ArgumentParser(description="           xXB3schdl_CryptXx \n\n 
 
 parser.add_argument('--version', '-V', help="Shows version", action="store_true")
 parser.add_argument('--logo', '-L', help = "Shows the logo", action="store_true")
+parser.add_argument('--info', '-I', help ="Get info on the specified command", action="store_true")
 parser.add_argument('--encrypt', '-E', help ="Select encryption method", action="store_true")
 parser.add_argument('--decrypt', '-D', help ="Select decryption method", action="store_true")
-parser.add_argument('--info', '-I', help ="Get info on the specified command", action="store_true")
 parser.add_argument('-type', '-t', type=int,
                     help="Select Input method: \n 0: Raw Input \n 1: File Input")
 parser.add_argument('-encoding', '-e',
@@ -106,8 +187,7 @@ if args.type==None:
     args.type=raw_input
 if args.algorithm in aliases:
     args.algorithm = aliases[args.algorithm]
-
-
+    
 ######### API Stuff
 
 listeners = []
@@ -123,31 +203,45 @@ def output(*args):
         l.onPrint(*args)
 
 
+
 ######### Command-Line Argument Functions
+
+if (len(sys.argv) == 1):
+    print(logo)
+    print("You did not enter any command-line argument, if you want to get a list with arguments, type 'Beschdlcrypt.py --help' for more information")
+    sys.exit()
+
 
 
 def commandLineChecks():
+    
+
     if args.list=="Algorithms" or args.list=="algos":
         output("   Availabe algorithms:\n")
         for Temp in algos:
             output(" - ", Temp)
-
+        sys.exit()
     elif args.list=="encodings":
         output("   Availabe algorithms:\n")
         for Temp in encodings:
             output(" - ", Temp)
         output("\nThese are not the only encodings, you can choose others, that are supported")
+        sys.exit()
+    elif args.list=="lists":
+        output("   Availabe lists\n")
+        for Temp in lists:
+            output(" - ", Temp)
+        sys.exit()
     elif not (args.list==None):
         output("You did not select a valid list")
-    if args.algorithm == None:
-        output("there was no algorithm selected")
         sys.exit()
+        
     if args.info:
+        if args.algorithm == None:
+            output("there was no algorithm selected")
+            sys.exit()
         output(helpinfo[args.algorithm])
         sys.exit()
-    checkEncDec()
-    checkInput()
-
     if (args.logo):
         output(logo)
         sys.exit()
@@ -159,7 +253,8 @@ def commandLineChecks():
         output("The actual Version is: ")
         output(version)
         sys.exit()
-
+    checkEncDec()
+    checkInput()
 
 ####### Algorithm functions
 
@@ -206,34 +301,33 @@ class Algorithms:
             else:
                 encDecErr()
             return out
-
+        
+        ### BINARY
+        
+        def binary():
+            out= ""
+            if (args.encrypt):
+                out = utils.getBinaryFromAscii(args.input)
+            elif (args.decrypt):
+                for char in args.input:
+                    if char not in ["0", "1", " "]:
+                        print("You need to give a valid binary input\n")
+                        sys.exit()
+                out = utils.getAsciiFromBinary(args.input)
+            else : 
+                encDecErr()
+            return out
+                
         ### BINARYIMAGE
 
         def binaryimage():
-            import urllib.request
-            import importlib
-            try:
-                import PIL
-            except ImportError:
-                try:
-                    import pip
-                except ImportError:
-                    output("Pip not installed. Installing")
-                    try:
-                        exec(pip_install_script = urllib.request.urlopen("https://bootstrap.pypa.io/get-pip.py").read())
-                    except URLError:
-                        output("Unable to connect to server")
-                output("Pillow not installed. Installing")
-                import importlib
-                pip.main(['install', "Pillow"])
-                globals()["PIL"] = importlib.import_module("PIL")
-
+            tryimport()
             from PIL import Image
             if(args.decrypt):
                 try:
                     im = Image.open(args.input)
                 except FileNotFoundError:
-                    output("Image '" + args.input + "' cannot be found")
+                    print("Image '" + args.input + "' cannot be found")
                     return;
                 pix = im.load()
                 errored_colors = False
@@ -244,7 +338,7 @@ class Algorithms:
                         pix_white = pix_color[0] == 255
                         if pix_color[0] != pix_color[1] or pix_color[1] != pix_color[2]:
                             if not errored_colors:
-                                output("Image has color values. Assuming all colored pixels are black")
+                                print("Image has color values. Assuming all colored pixels are black")
                                 errored_colors = True
                             pix_white = False
                         if pix_white: binary_output += "0"
@@ -255,9 +349,8 @@ class Algorithms:
 
             if(args.encrypt):
                 if args.output == None or len(args.output) == 0:
-                    output("Please specify an output with -o")
+                    print("Please specify an output with -o")
                     return
-                import math
                 binary = "".join(utils.getBinaryInput().split(" "))
                 size = math.ceil(math.sqrt(len(binary)))
                 im = Image.new("RGB", (size, size))
@@ -274,28 +367,29 @@ class Algorithms:
 
         ### MessageDigest 5 (MD5)
         def md5():
+            out = ""
             if (args.encrypt):
                 m = hashlib.md5(args.input.encode(args.encoding))
                 out = m.hexdigest()
             elif (args.decrypt):
-                output("ERROR: This is a OneWayFunction, you can only Encrypt stuff")
+                print("ERROR: This is a OneWayFunction, you can only Encrypt stuff")
             else:
                 encDecErr()
-            output(out)
+            print(out)
 
     class KeyEncryptions:
 
         ###X0R
 
         def x0r():
-            output(args.input)
+            print(args.input)
             data = utils.getBinaryInput()
             if args.key == None:
-                output("There was no key specified")
+                print("There was no key specified")
                 return;
             data = utils.getBinaryInput()
             if args.type == raw_input:
-                key = Utils.getBinaryFromAscii(args.key)
+                key = utils.getBinaryFromAscii(args.key)
             elif args.type == file_input:
                 key = utils.getBinaryFromAscii(open(args.key, "r").read())
             key = utils.getBinaryFromAscii(args.key)
@@ -337,74 +431,13 @@ def main():
         n.binaryimage()
     elif args.algorithm=="xor":
         k.x0r()
+    elif args.algorithm=="bin":
+        outp = n.binary()
+        output(outp)
     elif not (args.algorithm==None):
         output("Your algorithm is not valid, get a list of algorithms with 'Beschdlcrypt.py -list algorithms'; Did you type it wrong?")
 
-class Convert:
-    def texttohex():
-        if (args.input!="" and args.input!=1):
-            temp = bytes(args.input, args.encoding)
-            out = b2a_hex(temp)
-            return out
-        else:
-            output ("ERROR: Please enter a valid string")
-            sys.exit()
 
-######### Utils
-
-class Utils:
-
-    def getBinaryInput():
-        if args.type == raw_input:
-            return Utils.getBinaryFromAscii(args.input)
-        elif args.type == file_input:
-            return utils.getBinaryFromAscii(open(args.input, "r").read())
-        else:
-            output("Unknown input type: " + args.type)
-            sys.exit();
-
-    def getBinaryFromAscii(inp):#If inp is binary, returns itsself, otherwise converts it to binary from ascii
-        binary = inp
-        is_binary = True
-        for char in binary:
-            if char not in ["0", "1", " "]:
-                is_binary = False
-                break;
-        if not is_binary:
-            ascii_binary = ""
-            for char in binary:
-                bin_char = bin(int.from_bytes(char.encode(), 'big'))
-                bin_char = bin_char[2:len(bin_char)]
-                for i in range(8 - len(bin_char)):
-                    ascii_binary += "0"
-                ascii_binary += bin_char
-            binary = ascii_binary
-        return binary
-
-    def getAsciiFromBinary(inp):
-        out = ""
-        for i in range(int(len(inp) / 8)):
-            n = int(inp[i*8:(i+1)*8], 2)
-            out += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode()
-        return out
-
-    def printBinaryAscii(bin_input):
-        output("Binary Output:")
-        output(bin_input)
-        output("\n")
-        output("Ascii Output:")
-        output(Utils.getAsciiFromBinary(bin_input))
-
-    def openTempAsciiFile(bin_input):
-        import os, time
-        file = open("output.txt", "w")
-        file.write(Utils.getAsciiFromBinary(bin_input))
-        file.close()
-        os.startfile("output.txt")
-        time.sleep(1)
-        os.remove("output.txt")
-
-utils = Utils
 if(len(sys.argv) != 1):
     commandLineChecks()
     main()
