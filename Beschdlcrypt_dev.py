@@ -27,7 +27,7 @@ def tryimport():
                 pip.main(['install', "Pillow"])
                 globals()["PIL"] = importlib.import_module("PIL")
 
-                
+
                 ##### Utils
 
 
@@ -83,13 +83,13 @@ class Utils:
         time.sleep(1)
         os.remove("output.txt")
 
-utils = Utils        
+utils = Utils
 
 ########## A free line
 if len(sys.argv) != 1:
     print("\n")
-    
-    
+
+
 
 ########## Variables
 
@@ -105,9 +105,16 @@ aliases =   {
             "binaryimage": "bi",
             "xor": "x0r",
             "binary": "bin",
-            "SecureHashAlgorithm-256": "sha256"
+            "SecureHashAlgorithm-256": "sha256",
+
+            ###USED FOR API
+            algos[2]: "hex",
+            algos[4]: "bi",
+            algos[5]: "x0r"
             }
-non_cript_algos = ["x0r", "xor", "md5"]
+non_cript_algos = ["x0r", "md5"]
+file_input_only_algos = ["bi"]
+require_keys_algo = ["x0r"]
 raw_input = 0
 file_input = 1
 
@@ -189,7 +196,7 @@ if args.type==None:
     args.type=raw_input
 if args.algorithm in aliases:
     args.algorithm = aliases[args.algorithm]
-    
+
 ######### API Stuff
 
 listeners = []
@@ -208,15 +215,11 @@ def output(*args):
 
 ######### Command-Line Argument Functions
 
-if (len(sys.argv) == 1):
-    print(logo)
-    print("You did not enter any command-line argument, if you want to get a list with arguments, type 'Beschdlcrypt.py --help' for more information")
-    sys.exit()
-
+#Cant print anything if sys args are empty, as importing the file as an API will also run it
 
 
 def commandLineChecks():
-    
+
 
     if args.list=="Algorithms" or args.list=="algos":
         output("   Availabe algorithms:\n")
@@ -237,7 +240,7 @@ def commandLineChecks():
     elif not (args.list==None):
         output("You did not select a valid list")
         sys.exit()
-        
+
     if args.info:
         if args.algorithm == None:
             output("there was no algorithm selected")
@@ -303,9 +306,9 @@ class Algorithms:
             else:
                 encDecErr()
             return out
-        
+
         ### BINARY
-        
+
         def binary():
             out= ""
             if (args.encrypt):
@@ -316,10 +319,10 @@ class Algorithms:
                         print("You need to give a valid binary input\n")
                         sys.exit()
                 out = utils.getAsciiFromBinary(args.input)
-            else : 
+            else :
                 encDecErr()
             return out
-                
+
         ### BINARYIMAGE
 
         def binaryimage():
@@ -378,7 +381,7 @@ class Algorithms:
             else:
                 encDecErr()
             print(out)
-        
+
         ### SecureHashAlgorithm-256 (SHA-256)
         def sha256():
             if (args.encrypt):
@@ -389,8 +392,8 @@ class Algorithms:
             else:
                 encDecErr()
             print(out)
-            
-            
+
+
     class KeyEncryptions:
 
         ###X0R
