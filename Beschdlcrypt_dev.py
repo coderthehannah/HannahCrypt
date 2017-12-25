@@ -2,6 +2,7 @@ import sys
 import argparse
 import binascii
 import hashlib
+h = hashlib
 import math
 import importlib
 import urllib.request
@@ -95,15 +96,16 @@ if len(sys.argv) != 1:
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 
-version ="0.0.5a"
+version ="0.0.8a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256"]
 aliases =   {
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
             "binaryimage": "bi",
             "xor": "x0r",
-            "binary": "bin"
+            "binary": "bin",
+            "SecureHashAlgorithm-256": "sha256"
             }
 non_cript_algos = ["x0r", "xor", "md5"]
 raw_input = 0
@@ -369,14 +371,26 @@ class Algorithms:
         def md5():
             out = ""
             if (args.encrypt):
-                m = hashlib.md5(args.input.encode(args.encoding))
+                m = h.md5(args.input.encode(args.encoding))
                 out = m.hexdigest()
             elif (args.decrypt):
                 print("ERROR: This is a OneWayFunction, you can only Encrypt stuff")
             else:
                 encDecErr()
             print(out)
-
+        
+        ### SecureHashAlgorithm-256 (SHA-256)
+        def sha256():
+            if (args.encrypt):
+                s = h.sha256(args.input.encode(args.encoding))
+                out = s.hexdigest()
+            elif (args.decrypt):
+                print("ERROR: This is a OneWayFunction, you can only Encrypt stuff")
+            else:
+                encDecErr()
+            print(out)
+            
+            
     class KeyEncryptions:
 
         ###X0R
@@ -427,6 +441,8 @@ def main():
         output(outp)
     elif args.algorithm=="md5":
         o.md5()
+    elif args.algorithm=="sha256":
+        o.sha256()
     elif args.algorithm=="bi":
         n.binaryimage()
     elif args.algorithm=="xor":
