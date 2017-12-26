@@ -448,7 +448,7 @@ def main():
         o.sha256()
     elif args.algorithm=="bi":
         n.binaryimage()
-    elif args.algorithm=="xor":
+    elif args.algorithm=="x0r":
         k.x0r()
     elif args.algorithm=="bin":
         outp = n.binary()
