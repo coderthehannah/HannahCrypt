@@ -105,8 +105,8 @@ if len(sys.argv) != 1:
 
 
 
-    
-    
+
+
 ########## Variables
 
 
@@ -374,26 +374,11 @@ class Algorithms:
 
         ### MessageDigest 5 (MD5)
         def md5():
-            out = ""
-            if (args.encrypt):
-                m = h.md5(args.input.encode(args.encoding))
-                out = m.hexdigest()
-            elif (args.decrypt):
-                output("ERROR: This is a OneWayFunction, you can only Encrypt stuff")
-            else:
-                encDecErr()
-            output(out)
+            output(h.md5(args.input.encode(args.encoding)).hexdigest())
 
         ### SecureHashAlgorithm-256 (SHA-256)
         def sha256():
-            if (args.encrypt):
-                s = h.sha256(args.input.encode(args.encoding))
-                out = s.hexdigest()
-            elif (args.decrypt):
-                output("ERROR: This is a OneWayFunction, you can only Encrypt stuff")
-            else:
-                encDecErr()
-            output(out)
+            output(h.sha256(args.input.encode(args.encoding)).hexdigest())
 
 
     class KeyEncryptions:
@@ -434,6 +419,11 @@ k = a.KeyEncryptions
 
 
 def main():
+    if args.algorithm not in file_input_only_algos:
+        try:
+            args.input = open(args.input, "r").read()
+        except Exception:
+            pass;
     if (args.algorithm=="base64"):
         outp = n.base64()
         output(outp)

@@ -2,6 +2,7 @@ from tkinter import filedialog
 from tkinter import *
 import sys
 import os
+import math
 
 
 try:
@@ -22,8 +23,15 @@ class APIListener:
 
 isFileOpen = False
 
-parent.addListener(APIListener())
 master = Tk()
+
+arrow = PhotoImage("arrow")
+arrow.config(height = 11, width = 11)
+arrow_text = """#FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #3a3a3a #313131 #313131 #313131 #313131 #313131 #313131 #313131 #313131 #313131 #3a3a3a #050507 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #050507 #3f3f3f #030205 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #030205 #3f3f3f #FFFFFF #121212 #020103 #010002 #010002 #010002 #010002 #010002 #020103 #131313 #FFFFFF #FFFFFF #FFFFFF #0b070b #020103 #010002 #010002 #010002 #020103 #0b070b #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #060606 #010002 #010002 #010002 #060606 #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #555555 #040204 #010002 #040204 #7f7f7f #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #0c0c18 #030305 #0c0c18"""
+for a in range(len(arrow_text.split(" "))):
+    if arrow_text.split(" ")[a] != "#FFFFFF":
+        arrow.put("{" + arrow_text.split(" ")[a] + "}", (a % 11, math.floor(a / 11)))
+parent.addListener(APIListener())
 
 _type = StringVar(master)
 _type.set("Choose A Method")
@@ -61,16 +69,16 @@ def run():
 
 mainscreen = OptionMenu(master, _type, *parent.algos), 0.4, 0.1, 0.2, 0.1
 en_de_select = OptionMenu(master, _ende, "Encrypt", "Decrypt"), 0.7, 0.4, 0.1, 0.05
-string_input = Text(master), 0.2, 0.4, 0.4, 0.2
+string_input = Text(master, bg = "#FFFFFF"), 0.2, 0.4, 0.4, 0.2
 file_button = Button(master, text="Choose File", command = lambda: chosefile(file_text)), 0.2, 0.4, 0.1, 0.05
-file_text = Label(master, text = "No file Chosen", bg = "#f49e42", anchor = W), 0.3, 0.4, 0.2, 0.05
+file_text = Label(master, text = "No file Chosen", bg = "#FFFFFF", anchor = W), 0.3, 0.4, 0.2, 0.05
 text_file_button = Button(master, text="Choose File", command = lambda: chosefile(text_file_text)), 0.2, 0.7, 0.1, 0.05
-text_file_text = Label(master, text = "No file Chosen", bg = "#f49e42", anchor = W), 0.3, 0.7, 0.2, 0.05
-key_input_text = Label(master, text = "key:", bg = "#f49e42", anchor = W), 0.67, 0.5, 0.1, 0.05
+text_file_text = Label(master, text = "No file Chosen", bg = "#FFFFFF", anchor = W), 0.3, 0.7, 0.2, 0.05
+key_input_text = Label(master, text = "key:", bg = "#FFFFFF", anchor = W), 0.67, 0.5, 0.1, 0.05
 key_input = Text(master), 0.7, 0.5, 0.2, 0.1
 finalize_button = Button(master, text = "Encrypt", command = run), 0.4, 0.8, 0.2, 0.1
 output_input = Text(master), 0.7, 0.6, 0.2, 0.1
-output_input_text = Label(master, text = "output file:", bg = "#f49e42", anchor = W), 0.62, 0.6, 0.07, 0.05
+output_input_text = Label(master, text = "output file:", bg = "#FFFFFF", anchor = W), 0.62, 0.6, 0.07, 0.05
 
 def update():
     if _type.get() in parent.aliases:
@@ -122,13 +130,16 @@ def update():
 
 
 
-
-
 built_componants = []
 packed_componatns = []
 
 def build(c):
     if c in built_componants: return
+    if isinstance(c[0], OptionMenu):
+        c[0].config(bg = "white", fg = "black", borderwidth = 0, indicatoron=0, highlightbackground = "black", compound='right', image=arrow)
+        c[0]["menu"].config(bg = "white", fg = "black")
+    elif isinstance(c[0], Text):
+        c[0].config(highlightbackground = "red", borderwidth = 2)
     built_componants.append(c)
     if c not in packed_componatns:
         c[0].pack()
@@ -148,5 +159,5 @@ build(mainscreen)
 build(finalize_button)
 master.wm_title("Beschdlcrypt")
 master.after(50, update)
-master.config(width=1000, height=500, bg = "#f49e42")
+master.config(width=1000, height=500, bg = "#FFFFFF")
 master.mainloop()
