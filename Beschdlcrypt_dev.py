@@ -113,8 +113,9 @@ aliases =   {
             algos[5]: "x0r"
             }
 non_cript_algos = ["x0r", "md5"]
-file_input_only_algos = ["bi"]
-require_keys_algo = ["x0r"]
+file_input_only_algos = ["bi:d"]
+require_keys_algos = ["x0r"]
+require_output_algos = ["bi:e"]
 raw_input = 0
 file_input = 1
 
@@ -399,7 +400,6 @@ class Algorithms:
         ###X0R
 
         def x0r():
-            print(args.input)
             data = utils.getBinaryInput()
             if args.key == None:
                 print("There was no key specified")
