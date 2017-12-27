@@ -11,7 +11,7 @@ from base64 import b64decode, b64encode
 from binascii import a2b_hex
 from base64 import b32decode, b32encode
 
-def tryimport():
+def tryimportPIL():
             try:
                 import PIL
             except ImportError:
@@ -20,7 +20,8 @@ def tryimport():
                 except ImportError:
                     output("Pip not installed. Installing")
                     try:
-                        exec(pip_install_script = urllib.request.urlopen("https://bootstrap.pypa.io/get-pip.py").read())
+                        exec(pip_install_script =
+urllib.request.urlopen("https://bootstrap.pypa.io/get-pip.py").read())
                     except URLError:
                         output("Unable to connect to server")
                 output("Pillow not installed. Installing")
@@ -56,7 +57,8 @@ class Utils:
             output("Unknown input type: " + args.type)
             sys.exit();
 
-    def getBinaryFromAscii(inp):#If inp is binary, returns itsself, otherwise converts it to binary from ascii
+    def getBinaryFromAscii(inp):#If inp is binary, returns itsself,
+otherwise converts it to binary from ascii
         binary = inp
         is_binary = True
         for char in binary:
@@ -110,11 +112,15 @@ if len(sys.argv) != 1:
 ########## Variables
 
 
-logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
+logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /
+ /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <
+     /      <     \____\n <	  /        \         \ \n <_______/   <>
+  \________/ <>	\n\n"
 
-version ="0.0.9a"
+version ="0.1a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi
+(binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512"]
 aliases =   {
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
@@ -122,13 +128,14 @@ aliases =   {
             "xor": "x0r",
             "binary": "bin",
             "SecureHashAlgorithm-256": "sha256",
+            "SecureHashAlgorithm-1": "sha1",
 
             ###USED FOR API
             algos[2]: "hex",
             algos[4]: "bi",
             algos[5]: "x0r"
             }
-non_cript_algos = ["x0r", "md5"]
+non_cript_algos = ["x0r", "md5", "sha1", "sha256", "sha512"]
 file_input_only_algos = ["bi:d"]
 require_keys_algos = ["x0r"]
 require_output_algos = ["bi:e"]
@@ -138,12 +145,30 @@ file_input = 1
 encodings = ["UTF-8", "ASCII", "BIG5", "johab"]
 
 helpinfo = {
-            "base64": "Base64 represents binary data in an ASCII string format by translating it into a base-64 representation. This basically means that all kind of characters (ASCII, UTF8, UTF16...) with control characters can be mapped for example in English alphabet a-z, A-Z, 0-9",
-            "base32": "Base32 represents binary data in an ASCII string format by translating it into a base-32 representation. This basically means that all kind of characters (ASCII, UTF8, UTF16...) with control characters can be mapped for example in English alphabet a-z and 0-7",
+            "base64": "Base64 represents binary data in an ASCII
+string format by translating it into a base-64 representation. This
+basically means that all kind of characters (ASCII, UTF8, UTF16...)
+with control characters can be mapped for example in English alphabet
+a-z, A-Z, 0-9",
+            "base32": "Base32 represents binary data in an ASCII
+string format by translating it into a base-32 representation. This
+basically means that all kind of characters (ASCII, UTF8, UTF16...)
+with control characters can be mapped for example in English alphabet
+a-z and 0-7",
             "hex": "Converts hex to text, and text to hex",
-            "md5": "Message Digest 5 (MD5) is a hash function used in cryptography. Developed by Ronald Rivest in 1991, Message Digest 5 produces a 128-bit resulting hash value. Similar to other message-digest algorithms, it was largely developed for digital signature applications which make use of a large compressed file in a secure fashion.",
-            "bi": "BinaryImage is used to convert images to binary, and binary to images. It does so be cycling through each binary value, and placing a black pixel if the value is '1', and a white if '0'",
-            "x0r": "X0r is a cipher, that converts the input to binary, and the key to binary, then goes through each value of the input XORing each value. Note if the key is shorter than the input, it will be looped.",
+            "md5": "Message Digest 5 (MD5) is a hash function used in
+cryptography. Developed by Ronald Rivest in 1991, Message Digest 5
+produces a 128-bit resulting hash value. Similar to other
+message-digest algorithms, it was largely developed for digital
+signature applications which make use of a large compressed file in a
+secure fashion.",
+            "bi": "BinaryImage is used to convert images to binary,
+and binary to images. It does so be cycling through each binary value,
+and placing a black pixel if the value is '1', and a white if '0'",
+            "x0r": "X0r is a cipher, that converts the input to
+binary, and the key to binary, then goes through each value of the
+input XORing each value. Note if the key is shorter than the input, it
+will be looped.",
             "binary": "Converts the input to binary and vice versa"
             }
 
@@ -158,10 +183,16 @@ def checkEncDec():
     if (args.encrypt) and (args.decrypt):
         output("ERROR: Please select either encryption or decryption method")
         sys.exit()
-    if (args.encrypt==0) and (args.decrypt==0) and not (args.input==None) and not (args.version) and not (args.logo) and (args.list==None) and not args.algorithm in non_cript_algos:
-        output("Please specify if you want to encrypt or decrypt ('--encrypt/--decrypt' or '-E/-D')")
+    if (args.encrypt==0) and (args.decrypt==0) and not
+(args.input==None) and (args.list==None) and not args.algorithm in
+non_cript_algos:
+        output("Please specify if you want to encrypt or decrypt
+('--encrypt/--decrypt' or '-E/-D')")
         sys.exit()
-    output("\n")
+    elif (args.algorithm in non_cript_algos) and (args.encrypt or args.decrypt):
+        output("You selected a OneWayFunction, please remove
+'--encrypt/-E' or '--decrypt/-D'")
+        output("\n")
 
 def checkInput():
     if args.input == None or len(args.input) == 0:
@@ -174,17 +205,26 @@ def checkInput():
 
 MyArgsDesc = logo
 
-parser = argparse.ArgumentParser(description="           xXB3schdl_CryptXx \n\n Note, that all Arguments with a double Dash ('--') don't require an aditional input, all with one dash ('-') require one.")
+parser = argparse.ArgumentParser(description="
+xXB3schdl_CryptXx \n\n Note, that all Arguments with a double Dash
+('--') don't require an aditional input, all with one dash ('-')
+require one.")
 
 
 
-parser.add_argument('--version', '-V', help="Shows version", action="store_true")
-parser.add_argument('--logo', '-L', help = "Shows the logo", action="store_true")
-parser.add_argument('--info', '-I', help ="Get info on the specified command", action="store_true")
-parser.add_argument('--encrypt', '-E', help ="Select encryption method", action="store_true")
-parser.add_argument('--decrypt', '-D', help ="Select decryption method", action="store_true")
+parser.add_argument('--version', '-V', help="Shows version",
+action="store_true")
+parser.add_argument('--logo', '-L', help = "Shows the logo",
+action="store_true")
+parser.add_argument('--info', '-I', help ="Get info on the specified
+command", action="store_true")
+parser.add_argument('--encrypt', '-E', help ="Select encryption
+method", action="store_true")
+parser.add_argument('--decrypt', '-D', help ="Select decryption
+method", action="store_true")
 parser.add_argument('-type', '-t', type=int,
-                    help="Select Input method: \n 0: Raw Input \n 1: File Input")
+                    help="Select Input method: \n 0: Raw Input \n 1:
+File Input")
 parser.add_argument('-encoding', '-e',
                     help="Select the encoding")
 parser.add_argument('-list', '-l',
@@ -217,13 +257,14 @@ if args.algorithm in aliases:
 
 ######### Command-Line Argument Functions
 
-#Cant print anything if sys args are empty, as importing the file as an API will also run it
+#Cant print anything if sys args are empty, as importing the file as
+an API will also run it
 
 
 def commandLineChecks():
 
 
-    if args.list=="Algorithms" or args.list=="algos":
+    if args.list=="Algorithms" or args.list=="algos" or args.list=="algorithms":
         output("   Availabe algorithms:\n")
         for Temp in algos:
             output(" - ", Temp)
@@ -232,7 +273,8 @@ def commandLineChecks():
         output("   Availabe algorithms:\n")
         for Temp in encodings:
             output(" - ", Temp)
-        output("\nThese are not the only encodings, you can choose others, that are supported")
+        output("\nThese are not the only encodings, you can choose
+others, that are supported")
         sys.exit()
     elif args.list=="lists":
         output("   Availabe lists\n")
@@ -328,7 +370,7 @@ class Algorithms:
         ### BINARYIMAGE
 
         def binaryimage():
-            tryimport()
+            tryimportPIL()
             from PIL import Image
             if(args.decrypt):
                 try:
@@ -343,9 +385,11 @@ class Algorithms:
                     for x in range(im.size[1]):
                         pix_color = pix[x,y]
                         pix_white = pix_color[0] == 255
-                        if pix_color[0] != pix_color[1] or pix_color[1] != pix_color[2]:
+                        if pix_color[0] != pix_color[1] or
+pix_color[1] != pix_color[2]:
                             if not errored_colors:
-                                output("Image has color values. Assuming all colored pixels are black")
+                                output("Image has color values.
+Assuming all colored pixels are black")
                                 errored_colors = True
                             pix_white = False
                         if pix_white: binary_output += "0"
@@ -366,7 +410,8 @@ class Algorithms:
                     color = 0
                     if i >= len(binary) or binary[i] == "0":
                         color = 255
-                    pix[i % size, math.floor(i / size)] = (color, color, color, 255)
+                    pix[i % size, math.floor(i / size)] = (color,
+color, color, 255)
                 im.save(args.output + ".png")
 
 
@@ -375,12 +420,22 @@ class Algorithms:
         ### MessageDigest 5 (MD5)
         def md5():
             output(h.md5(args.input.encode(args.encoding)).hexdigest())
-
+        ### MessageDigest 4 (MD4)
+        def sha512():
+            output(h.sha512(args.input.encode(args.encoding)).hexdigest())
         ### SecureHashAlgorithm-256 (SHA-256)
         def sha256():
             output(h.sha256(args.input.encode(args.encoding)).hexdigest())
 
-
+        ### SecureHashAlgorithm-1 (SHA-1)
+        def sha1():
+            output(h.sha1(args.input.encode(args.encoding)).hexdigest())
+        ### CyclicReadunancyCheck32 (CRC32)
+        def crc32():
+            temp =
+binascii.crc32(bytes(args.input.encode(args.encoding))) & 0xFFFFFFFF
+            output("%08X" % temp)
+        ###
     class KeyEncryptions:
 
         ###X0R
@@ -437,6 +492,12 @@ def main():
         o.md5()
     elif args.algorithm=="sha256":
         o.sha256()
+    elif args.algorithm=="sha1":
+        o.sha1()
+    elif args.algorithm=="crc32":
+        o.crc32()
+    elif args.algorithm=="sha512":
+        o.sha512()
     elif args.algorithm=="bi":
         n.binaryimage()
     elif args.algorithm=="x0r":
@@ -445,7 +506,8 @@ def main():
         outp = n.binary()
         output(outp)
     elif not (args.algorithm==None):
-        output("Your algorithm is not valid, get a list of algorithms with 'Beschdlcrypt.py -list algorithms'; Did you type it wrong?")
+        output("Your algorithm is not valid, get a list of algorithms
+with 'Beschdlcrypt.py -list algorithms'; Did you type it wrong?")
 
 
 if(len(sys.argv) != 1):
