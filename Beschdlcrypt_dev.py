@@ -37,6 +37,7 @@ listeners = []
 def addListener(listener):
     listener.onPrint("")
     listener.activate()
+    listeners.append(listener)
 
 def output(*args):
     if(len(listeners) == 0):
@@ -117,7 +118,7 @@ logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /       
 
 version ="0.1a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32"]
 aliases =   {
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
