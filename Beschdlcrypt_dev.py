@@ -52,13 +52,7 @@ def output(*args):
 class Utils:
 
     def getBinaryInput():
-        if args.type == raw_input:
-            return Utils.getBinaryFromAscii(args.input)
-        elif args.type == file_input:
-            return utils.getBinaryFromAscii(open(args.input, "r").read())
-        else:
-            output("Unknown input type: " + args.type)
-            sys.exit();
+        return Utils.getBinaryFromAscii(args.input)
 
     def getBinaryFromAscii(inp):#If inp is binary, returns itsself, otherwise converts it to binary from ascii
         binary = inp
@@ -282,12 +276,11 @@ class Algorithms:
             if (args.encrypt):
                 #### Here you need bytes
                 out = b64encode(bytes(args.input, args.encoding))
-                out = str(out)[2:len(out) - 1]
             elif (args.decrypt):
                 out = b64decode(args.input)
             else:
                 encDecErr()
-            return out
+            return str(out)[2:len(out) + 2]
 
         ### BASE32
 
@@ -296,12 +289,11 @@ class Algorithms:
             if (args.encrypt):
                 #### Here you need bytes
                 out = b32encode(bytes(args.input, args.encoding))
-                out = str(out)[2:len(out) - 1]
             elif (args.decrypt):
                 out = b32decode(args.input)
             else:
                 encDecErr()
-            return out
+            return str(out)[2:len(out) + 2]
 
 		### HEXADECIMAL
 
@@ -309,9 +301,11 @@ class Algorithms:
             out = ""
             if (args.encrypt):
                 temp = bytes(args.input, args.encoding)
-                out = str(b2a_hex(temp))[2:len(out) - 1]
+                out = str(b2a_hex(temp))
+                out = out[2:len(out) - 1]
             elif (args.decrypt):
-                out = str(a2b_hex(args.input))[2:len(out) - 1]
+                out = str(a2b_hex(args.input))
+                out = out[2:len(out) - 1]
             else:
                 encDecErr()
             return out
