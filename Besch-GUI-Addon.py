@@ -28,6 +28,7 @@ master = Tk()
 arrow = PhotoImage("arrow")
 arrow.config(height = 11, width = 11)
 arrow_text = """#FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #3a3a3a #313131 #313131 #313131 #313131 #313131 #313131 #313131 #313131 #313131 #3a3a3a #050507 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #050507 #3f3f3f #030205 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #030205 #3f3f3f #FFFFFF #121212 #020103 #010002 #010002 #010002 #010002 #010002 #020103 #131313 #FFFFFF #FFFFFF #FFFFFF #0b070b #020103 #010002 #010002 #010002 #020103 #0b070b #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #060606 #010002 #010002 #010002 #060606 #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #555555 #040204 #010002 #040204 #7f7f7f #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #0c0c18 #030305 #0c0c18"""
+
 for a in range(len(arrow_text.split(" "))):
     if arrow_text.split(" ")[a] != "#FFFFFF":
         arrow.put("{" + arrow_text.split(" ")[a] + "}", (a % 11, math.floor(a / 11)))
@@ -139,7 +140,9 @@ def build(c):
         c[0].config(bg = "white", fg = "black", borderwidth = 0, indicatoron=0, highlightbackground = "black", compound='right', image=arrow)
         c[0]["menu"].config(bg = "white", fg = "black")
     elif isinstance(c[0], Text):
-        c[0].config(highlightbackground = "red", borderwidth = 2)
+        c[0].config(highlightbackground="black", highlightcolor="black", highlightthickness=1, bd= 0)
+    elif isinstance(c[0], Button):
+        c[0].config(bg = "white", highlightbackground="black", highlightcolor="black", highlightthickness=1, bd=1)
     built_componants.append(c)
     if c not in packed_componatns:
         c[0].pack()
