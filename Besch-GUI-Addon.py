@@ -28,6 +28,7 @@ master = Tk()
 arrow = PhotoImage("arrow")
 arrow.config(height = 11, width = 11)
 arrow_text = """#FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #3a3a3a #313131 #313131 #313131 #313131 #313131 #313131 #313131 #313131 #313131 #3a3a3a #050507 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #050507 #3f3f3f #030205 #010002 #010002 #010002 #010002 #010002 #010002 #010002 #030205 #3f3f3f #FFFFFF #121212 #020103 #010002 #010002 #010002 #010002 #010002 #020103 #131313 #FFFFFF #FFFFFF #FFFFFF #0b070b #020103 #010002 #010002 #010002 #020103 #0b070b #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #060606 #010002 #010002 #010002 #060606 #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #555555 #040204 #010002 #040204 #7f7f7f #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #FFFFFF #0c0c18 #030305 #0c0c18"""
+
 for a in range(len(arrow_text.split(" "))):
     if arrow_text.split(" ")[a] != "#FFFFFF":
         arrow.put("{" + arrow_text.split(" ")[a] + "}", (a % 11, math.floor(a / 11)))
@@ -36,8 +37,7 @@ parent.addListener(APIListener())
 _type = StringVar(master)
 _type.set("Choose A Method")
 
-_ende = StringVar(master)
-_ende.set("Encrypt")
+_en = IntVar()
 
 current_file = ""
 
@@ -51,7 +51,7 @@ def chosefile(c):
 
 def run():
     parent.args.algorithm = _type.get()
-    if _ende.get() == "Encrypt":
+    if _en.get() == 0:
         ende = ":e"
     else:
         ende = ":d"
@@ -63,12 +63,13 @@ def run():
         parent.args.type = parent.raw_input
     parent.args.output = output_input[0].get("1.0","end")[0:-1]
     parent.args.key = key_input[0].get("1.0","end")
-    parent.args.encrypt = _ende.get() == "Encrypt"
-    parent.args.decrypt = _ende.get() == "Decrypt"
+    parent.args.encrypt = _en.get() == 0
+    parent.args.decrypt = _en.get() == 1
     parent.main()
 
 mainscreen = OptionMenu(master, _type, *parent.algos), 0.4, 0.1, 0.2, 0.1
-en_de_select = OptionMenu(master, _ende, "Encrypt", "Decrypt"), 0.7, 0.4, 0.1, 0.05
+en_sel = Radiobutton(master, text = "Encrypt", variable=_en, value=0), 0.7, 0.4, 0.1, 0.05
+de_sel = Radiobutton(master, text = "Decrypt", variable=_en, value=1), 0.7, 0.45, 0.1, 0.05
 string_input = Text(master, bg = "#FFFFFF"), 0.2, 0.4, 0.4, 0.2
 file_button = Button(master, text="Choose File", command = lambda: chosefile(file_text)), 0.2, 0.4, 0.1, 0.05
 file_text = Label(master, text = "No file Chosen", bg = "#FFFFFF", anchor = W), 0.3, 0.4, 0.2, 0.05
@@ -84,20 +85,22 @@ def update():
     if _type.get() in parent.aliases:
         _type.set(parent.aliases[_type.get()])
     master.after(50, update)
-    if _ende.get() == "Encrypt":
+    if _en.get() == 0:
         finalize_button[0].config(text = "Encrypt")
-    elif _ende.get() == "Decrypt":
+    else:
         finalize_button[0].config(text = "Decrypt")
-    if _ende.get() == "Encrypt":
+    if _en.get() == 0:
         ende = ":e"
     else:
         ende = ":d"
 
     if _type.get() not in parent.non_cript_algos and _type.get() + ende not in parent.non_cript_algos:
-        build(en_de_select)
+        build(en_sel)
+        build(de_sel)
     else:
         finalize_button[0].config(text = "Go")
-        remove(en_de_select)
+        remove(en_sel)
+        remove(de_sel)
 
     if _type.get() not in parent.file_input_only_algos and _type.get() + ende not in parent.file_input_only_algos:
         build(string_input)
@@ -136,10 +139,14 @@ packed_componatns = []
 def build(c):
     if c in built_componants: return
     if isinstance(c[0], OptionMenu):
-        c[0].config(bg = "white", fg = "black", borderwidth = 0, indicatoron=0, highlightbackground = "black", compound='right', image=arrow)
+        c[0].config(borderwidth = 1, bg = "white", relief = "solid", highlightbackground = "white", compound='right', image=arrow, indicatoron=0)
         c[0]["menu"].config(bg = "white", fg = "black")
     elif isinstance(c[0], Text):
-        c[0].config(highlightbackground = "red", borderwidth = 2)
+        c[0].config(relief = "solid")
+    elif isinstance(c[0], Button):
+        c[0].config(bg = "white", relief = "solid", overrelief = "solid", borderwidth = 1)
+    elif isinstance(c[0], Radiobutton):
+        c[0].config(bg = "white", activebackground = "white")
     built_componants.append(c)
     if c not in packed_componatns:
         c[0].pack()
