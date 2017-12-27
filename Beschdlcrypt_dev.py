@@ -282,6 +282,7 @@ class Algorithms:
             if (args.encrypt):
                 #### Here you need bytes
                 out = b64encode(bytes(args.input, args.encoding))
+                out = str(out)[2:len(out) - 1]
             elif (args.decrypt):
                 out = b64decode(args.input)
             else:
@@ -295,6 +296,7 @@ class Algorithms:
             if (args.encrypt):
                 #### Here you need bytes
                 out = b32encode(bytes(args.input, args.encoding))
+                out = str(out)[2:len(out) - 1]
             elif (args.decrypt):
                 out = b32decode(args.input)
             else:
@@ -307,9 +309,9 @@ class Algorithms:
             out = ""
             if (args.encrypt):
                 temp = bytes(args.input, args.encoding)
-                out = b2a_hex(temp)
+                out = str(b2a_hex(temp))[2:len(out) - 1]
             elif (args.decrypt):
-                out = a2b_hex(args.input)
+                out = str(a2b_hex(args.input))[2:len(out) - 1]
             else:
                 encDecErr()
             return out
@@ -440,7 +442,7 @@ def main():
             pass;
     if (args.algorithm=="base64"):
         outp = n.base64()
-        output(outp)
+        #output(outp)
     elif (args.algorithm=="base32"):
         outp = n.base32()
         output(outp)

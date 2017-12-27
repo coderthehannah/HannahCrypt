@@ -20,8 +20,13 @@ class APIListener:
     def onPrint(self, *args):
         if self.isActive:
             t = output_box[0].get("1.0","end")
-            output_box[0].delete(1.0, "end")
-            output_box[0].insert("end", t + " ".join(args))
+            if str(t)[0] == "\n":
+                t = t[1:len(t)]
+            output_box[0].delete("1.0", "end")
+            arglist = []
+            for item in args:
+                arglist.append(str(item))
+            output_box[0].insert("1.0", t + " ".join(arglist))
 
     def activate(self):
         self.isActive = True
@@ -55,6 +60,7 @@ def chosefile(c):
     c[0].config(text = filetext)
 
 def run():
+    toggleOutIn()
     parent.args.algorithm = _type.get()
     if _en.get() == 0:
         ende = ":e"
@@ -71,10 +77,10 @@ def run():
     parent.args.encrypt = _en.get() == 0
     parent.args.decrypt = _en.get() == 1
     parent.main()
-    toggleOutIn()
 
 def toggleOutIn():
     global onOutPutScreen
+    output_box[0].delete(1.0, "end")
     onOutPutScreen = not onOutPutScreen
 
 onOutPutScreen = False
