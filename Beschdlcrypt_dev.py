@@ -442,7 +442,7 @@ def main():
             pass;
     if (args.algorithm=="base64"):
         outp = n.base64()
-        #output(outp)
+        output(outp)
     elif (args.algorithm=="base32"):
         outp = n.base32()
         output(outp)
