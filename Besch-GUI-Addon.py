@@ -4,6 +4,7 @@ import sys
 import os
 import math
 
+version = "0.0.1"
 
 try:
     import Beschdlcrypt_dev
@@ -15,11 +16,15 @@ import Beschdlcrypt_dev as parent
 ######### API stuff
 class APIListener:
     isActive = False
+
     def onPrint(self, *args):
-        print(*args)#Need to change to output to GUI
+        if self.isActive:
+            t = output_box[0].get("1.0","end")
+            output_box[0].delete(1.0, "end")
+            output_box[0].insert("end", t + " ".join(args))
 
     def activate(self):
-        isActive = True
+        self.isActive = True
 
 isFileOpen = False
 
@@ -66,6 +71,13 @@ def run():
     parent.args.encrypt = _en.get() == 0
     parent.args.decrypt = _en.get() == 1
     parent.main()
+    toggleOutIn()
+
+def toggleOutIn():
+    global onOutPutScreen
+    onOutPutScreen = not onOutPutScreen
+
+onOutPutScreen = False
 
 mainscreen = OptionMenu(master, _type, *parent.algos), 0.4, 0.1, 0.2, 0.1
 en_sel = Radiobutton(master, text = "Encrypt", variable=_en, value=0), 0.7, 0.4, 0.1, 0.05
@@ -80,54 +92,56 @@ key_input = Text(master), 0.7, 0.5, 0.2, 0.1
 finalize_button = Button(master, text = "Encrypt", command = run), 0.4, 0.8, 0.2, 0.1
 output_input = Text(master), 0.7, 0.6, 0.2, 0.1
 output_input_text = Label(master, text = "output file:", bg = "#FFFFFF", anchor = W), 0.62, 0.6, 0.07, 0.05
+_copyright = Label(master, text = version + "\nWyn Price 2017", bg = "#FFFFFF"), 0.87, 0.9, 0.15, 0.1
 
+output_box = Text(master), 0.1, 0.05, 0.8, 0.7
+output_back = Button(master, text = "back", command = toggleOutIn), 0.4, 0.8, 0.2, 0.1
 def update():
+    componants = [_copyright]
     if _type.get() in parent.aliases:
         _type.set(parent.aliases[_type.get()])
     master.after(50, update)
-    if _en.get() == 0:
-        finalize_button[0].config(text = "Encrypt")
+    if onOutPutScreen:
+        componants.append(output_back)
+        componants.append(output_box)
     else:
-        finalize_button[0].config(text = "Decrypt")
-    if _en.get() == 0:
-        ende = ":e"
-    else:
-        ende = ":d"
+        componants.append(mainscreen)
+        componants.append(finalize_button)
+        if _en.get() == 0:
+            finalize_button[0].config(text = "Encrypt")
+        else:
+            finalize_button[0].config(text = "Decrypt")
+        if _en.get() == 0:
+            ende = ":e"
+        else:
+            ende = ":d"
+        if _type.get() not in parent.non_cript_algos and _type.get() + ende not in parent.non_cript_algos:
+            componants.append(en_sel)
+            componants.append(de_sel)
+        else:
+            finalize_button[0].config(text = "Go")
 
-    if _type.get() not in parent.non_cript_algos and _type.get() + ende not in parent.non_cript_algos:
-        build(en_sel)
-        build(de_sel)
-    else:
-        finalize_button[0].config(text = "Go")
-        remove(en_sel)
-        remove(de_sel)
+        if _type.get() not in parent.file_input_only_algos and _type.get() + ende not in parent.file_input_only_algos:
+            componants.append(string_input)
+            componants.append(text_file_button)
+            componants.append(text_file_text)
+        else:
+            componants.append(file_button)
+            componants.append(file_text)
 
-    if _type.get() not in parent.file_input_only_algos and _type.get() + ende not in parent.file_input_only_algos:
-        build(string_input)
-        build(text_file_button)
-        build(text_file_text)
-        remove(file_button)
-        remove(file_text)
-    else:
-        remove(string_input)
-        remove(text_file_button)
-        remove(text_file_text)
-        build(file_button)
-        build(file_text)
+        if _type.get() in parent.require_keys_algos or _type.get() + ende in parent.require_keys_algos:
+            componants.append(key_input)
+            componants.append(key_input_text)
 
-    if _type.get() in parent.require_keys_algos or _type.get() + ende in parent.require_keys_algos:
-        build(key_input)
-        build(key_input_text)
-    else:
-        remove(key_input)
-        remove(key_input_text)
+        if _type.get() in parent.require_output_algos or _type.get() + ende in parent.require_output_algos:
+            componants.append(output_input)
+            componants.append(output_input_text)
 
-    if _type.get() in parent.require_output_algos or _type.get() + ende in parent.require_output_algos:
-        build(output_input)
-        build(output_input_text)
-    else:
-        remove(output_input)
-        remove(output_input_text)
+    for c in componants:
+        build(c)
+    for c in built_componants:
+        if c not in componants:
+            remove(c)
 
 
 
@@ -164,6 +178,7 @@ def openfile():
 
 build(mainscreen)
 build(finalize_button)
+build(_copyright)
 master.wm_title("Beschdlcrypt")
 master.after(50, update)
 master.config(width=1000, height=500, bg = "#FFFFFF")
