@@ -1,3 +1,5 @@
+
+
 import sys
 import argparse
 import binascii
@@ -11,7 +13,7 @@ from base64 import b64decode, b64encode
 from binascii import a2b_hex
 from base64 import b32decode, b32encode
 
-def tryimport():
+def tryimportPIL():
             try:
                 import PIL
             except ImportError:
@@ -112,9 +114,9 @@ if len(sys.argv) != 1:
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 
-version ="0.0.9a"
+version ="0.1a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512"]
 aliases =   {
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
@@ -122,6 +124,7 @@ aliases =   {
             "xor": "x0r",
             "binary": "bin",
             "SecureHashAlgorithm-256": "sha256",
+            "SecureHashAlgorithm-1": "sha1",
 
             ###USED FOR API
             algos[2]: "hex",
@@ -328,7 +331,7 @@ class Algorithms:
         ### BINARYIMAGE
 
         def binaryimage():
-            tryimport()
+            tryimportPIL()
             from PIL import Image
             if(args.decrypt):
                 try:
@@ -375,12 +378,21 @@ class Algorithms:
         ### MessageDigest 5 (MD5)
         def md5():
             output(h.md5(args.input.encode(args.encoding)).hexdigest())
-
+        ### MessageDigest 4 (MD4)
+        def sha512():
+            output(h.sha512(args.input.encode(args.encoding)).hexdigest())
         ### SecureHashAlgorithm-256 (SHA-256)
         def sha256():
             output(h.sha256(args.input.encode(args.encoding)).hexdigest())
 
-
+        ### SecureHashAlgorithm-1 (SHA-1)
+        def sha1():
+            output(h.sha1(args.input.encode(args.encoding)).hexdigest())
+        ### CyclicReadunancyCheck32 (CRC32)
+        def crc32():
+            temp = binascii.crc32(bytes(args.input.encode(args.encoding))) & 0xFFFFFFFF
+            output("%08X" % temp)
+        ###
     class KeyEncryptions:
 
         ###X0R
@@ -437,6 +449,12 @@ def main():
         o.md5()
     elif args.algorithm=="sha256":
         o.sha256()
+    elif args.algorithm=="sha1":
+        o.sha1()
+    elif args.algorithm=="crc32":
+        o.crc32()
+    elif args.algorithm=="sha512":
+        o.sha512()
     elif args.algorithm=="bi":
         n.binaryimage()
     elif args.algorithm=="x0r":
