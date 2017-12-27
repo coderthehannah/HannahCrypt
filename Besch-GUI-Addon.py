@@ -4,7 +4,7 @@ import sys
 import os
 import math
 
-
+version = "0.0.1"
 try:
     import Beschdlcrypt_dev
 except ImportError:
@@ -80,7 +80,7 @@ key_input = Text(master), 0.7, 0.5, 0.2, 0.1
 finalize_button = Button(master, text = "Encrypt", command = run), 0.4, 0.8, 0.2, 0.1
 output_input = Text(master), 0.7, 0.6, 0.2, 0.1
 output_input_text = Label(master, text = "output file:", bg = "#FFFFFF", anchor = W), 0.62, 0.6, 0.07, 0.05
-
+_copyright = Label(master, text = version + "\nWyn Price 2017", bg = "#FFFFFF"), 0.87, 0.9, 0.15, 0.1
 def update():
     if _type.get() in parent.aliases:
         _type.set(parent.aliases[_type.get()])
@@ -164,6 +164,7 @@ def openfile():
 
 build(mainscreen)
 build(finalize_button)
+build(_copyright)
 master.wm_title("Beschdlcrypt")
 master.after(50, update)
 master.config(width=1000, height=500, bg = "#FFFFFF")
