@@ -25,6 +25,7 @@ def tryimportPIL():
             try:
                 import PIL
             except ImportError:
+                import pip
                 tryimportPIP()
                 output("Pillow not installed. Installing")
                 pip.main(['install', "Pillow"])
@@ -52,44 +53,59 @@ def output(*args):
 class Utils:
 
     def getBinaryInput():
-        return Utils.getBinaryFromAscii(args.input)
+        return Utils.getBinaryFromString(args.input)
 
-    def getBinaryFromAscii(inp):#If inp is binary, returns itsself, otherwise converts it to binary from ascii
+    def getBinaryFromString(inp):
         binary = inp
         is_binary = True
+        is_hex = True
+        bin_out = ""
         for char in binary:
-            if char not in ["0", "1", " "]:
+            if char not in ["0", "1", " ", "\n"]:
                 is_binary = False
                 break;
+            elif char != " " and char != "\n":
+                bin_out += char
         if not is_binary:
+            hex_out = ""
+            for char in binary:
+                if char not in list("0123456789ABCDEF \n"):
+                    is_hex = False
+                    break;
+                elif char != " " and char != "\n":
+                    hex_out+= char
+            if is_hex:
+                return bin(int(hex_out, 16))
             ascii_binary = ""
             for char in binary:
-                bin_char = bin(int.from_bytes(char.encode(), 'big'))
+                bin_char = bin(int.from_bytes(char.encode(args.encoding), 'big'))
                 bin_char = bin_char[2:len(bin_char)]
                 for i in range(8 - len(bin_char)):
                     ascii_binary += "0"
                 ascii_binary += bin_char
             binary = ascii_binary
+        else:
+            return bin_out
         return binary
 
-    def getAsciiFromBinary(inp):
+    def getStringFromBinary(inp):
         out = ""
         for i in range(int(len(inp) / 8)):
             n = int(inp[i*8:(i+1)*8], 2)
-            out += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode()
+            out += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(args.encoding)
         return out
 
     def printBinaryAscii(bin_input):
         output("Binary Output:")
         output(bin_input)
         output("\n")
-        output("Ascii Output:")
-        output(Utils.getAsciiFromBinary(bin_input))
+        output("String Output:")
+        output(Utils.getStringFromBinary(bin_input))
 
     def openTempAsciiFile(bin_input):
         import os, time
         file = open("output.txt", "w")
-        file.write(Utils.getAsciiFromBinary(bin_input))
+        file.write(Utils.getStringFromBinary(bin_input))
         file.close()
         os.startfile("output.txt")
         time.sleep(1)
@@ -295,36 +311,6 @@ class Algorithms:
                 encDecErr()
             return str(out)[2:len(out) + 2]
 
-		### HEXADECIMAL
-
-        def hex():
-            out = ""
-            if (args.encrypt):
-                temp = bytes(args.input, args.encoding)
-                out = str(b2a_hex(temp))
-                out = out[2:len(out) - 1]
-            elif (args.decrypt):
-                out = str(a2b_hex(args.input))
-                out = out[2:len(out) - 1]
-            else:
-                encDecErr()
-            return out
-
-        ### BINARY
-
-        def binary():
-            out= ""
-            if (args.encrypt):
-                out = utils.getBinaryFromAscii(args.input)
-            elif (args.decrypt):
-                for char in args.input:
-                    if char not in ["0", "1", " "]:
-                        output("You need to give a valid binary input\n")
-                        sys.exit()
-                out = utils.getAsciiFromBinary(args.input)
-            else :
-                encDecErr()
-            return out
 
         ### BINARYIMAGE
 
@@ -402,10 +388,10 @@ class Algorithms:
                 return;
             data = utils.getBinaryInput()
             if args.type == raw_input:
-                key = utils.getBinaryFromAscii(args.key)
+                key = utils.getBinaryFromString(args.key)
             elif args.type == file_input:
-                key = utils.getBinaryFromAscii(open(args.key, "r").read())
-            key = utils.getBinaryFromAscii(args.key)
+                key = utils.getBinaryFromString(open(args.key, "r").read())
+            key = utils.getBinaryFromString(args.key)
             original_key = key
             while len(key) < len(data): key += original_key
             binary_output = ""
@@ -417,12 +403,42 @@ class Algorithms:
             if args.type == file_input:
                 utils.openTempAsciiFile(binary_output)
 
+    class Conversions:
+
+        ### HEXADECIMAL
+
+        def hex():
+            out = ""
+            if (args.encrypt):
+                out = "".join(hex(int(utils.getBinaryInput(), 2)).upper().split("0X"))
+            elif (args.decrypt):
+                out = a2b_hex(args.input)
+            else:
+                encDecErr()
+            return out
+
+        ### BINARY
+
+        def binary():
+            out= ""
+            if (args.encrypt):
+                out = utils.getBinaryFromString(args.input)
+            elif (args.decrypt):
+                for char in args.input:
+                    if char not in ["0", "1", " "]:
+                        output("You need to give a valid binary input\n")
+                        sys.exit()
+                out = utils.getStringFromBinary(args.input)
+            else :
+                encDecErr()
+            return out
+
 
 a = Algorithms
 n = a.NonKeyEncryptions
 o = a.OneWayFunctions
 k = a.KeyEncryptions
-
+c = a.Conversions
 
 ###### This is the guy that switches between the functions
 
@@ -441,7 +457,7 @@ def main():
         outp = n.base32()
         output(outp)
     elif args.algorithm=="hex":
-        outp = n.hex()
+        outp = c.hex()
         output(outp)
     elif args.algorithm=="md5":
         o.md5()
@@ -458,7 +474,7 @@ def main():
     elif args.algorithm=="x0r":
         k.x0r()
     elif args.algorithm=="bin":
-        outp = n.binary()
+        outp = c.binary()
         output(outp)
     elif not (args.algorithm==None):
         output("Your algorithm is not valid, get a list of algorithms with 'Beschdlcrypt.py -list algorithms'; Did you type it wrong?")
