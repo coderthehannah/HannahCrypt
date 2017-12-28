@@ -76,7 +76,7 @@ def isIn(l):
         ende = ":e"
     else:
         ende = ":d"
-    return _type.get() in l or _type.get() + ende in l
+    return _type.get().lower() in l or _type.get().lower() + ende in l
 
 def setConvertOutput(output):
     conversion_ouput[0].delete("1.0", "end")
@@ -133,7 +133,7 @@ def run():
         return
     parent.args.encrypt = _en.get() == 0
     parent.args.decrypt = _en.get() == 1
-    parent.args.algorithm = _type.get()
+    parent.args.algorithm = _type.get().lower()
     toggleOutIn()
 
     if _en.get() == 0:
@@ -158,9 +158,10 @@ def toggleOutIn():
 onOutPutScreen = False
 algolist = ["Convertion"]
 for algo in parent.algos:
+    algo1 = algo
     if algo in parent.aliases:
-        algo = parent.aliases[algo]
-    if algo not in parent.conversion_algos:
+        algo1 = parent.aliases[algo]
+    if algo1 not in parent.conversion_algos:
         algolist.append(str(algo).capitalize())
 
 conversion_list = ["Text"]
@@ -194,8 +195,8 @@ output_box = Text(master), 0.1, 0.05, 0.8, 0.7
 output_back = Button(master, text = "back", command = toggleOutIn), 0.4, 0.8, 0.2, 0.1
 def update():
     componants = [_copyright]
-    if _type.get() in parent.aliases:
-        _type.set(parent.aliases[_type.get()])
+    if _type.get().lower() in parent.aliases:
+        _type.set(parent.aliases[_type.get().lower()].capitalize())
     master.after(50, update)
     if _type.get() == "Convertion":
         componants.append(mainscreen)
@@ -246,8 +247,6 @@ def update():
     for c in built_componants:
         if c not in componants:
             remove(c)
-
-
 
 
 

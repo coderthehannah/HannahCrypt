@@ -95,7 +95,7 @@ class Utils:
             out += n.to_bytes((n.bit_length() + 7) // 8, 'big').decode(args.encoding)
         return out
 
-    def printBinaryAscii(bin_input):
+    def printBinaryString(bin_input):
         output("Binary Output:")
         output(bin_input)
         output("\n")
@@ -128,13 +128,12 @@ logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /       
 
 version ="0.1a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32"] #MUST BE LOWERCASE
 aliases =   {
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
             "binaryimage": "bi",
             "xor": "x0r",
-            "binary": "bin",
             "SecureHashAlgorithm-256": "sha256",
             "SecureHashAlgorithm-1": "sha1",
 
@@ -338,7 +337,7 @@ class Algorithms:
                             pix_white = False
                         if pix_white: binary_output += "0"
                         else: binary_output += "1"
-                utils.printBinaryAscii(binary_output)
+                utils.printBinaryString(binary_output)
 
 
 
@@ -355,7 +354,14 @@ class Algorithms:
                     if i >= len(binary) or binary[i] == "0":
                         color = 255
                     pix[i % size, math.floor(i / size)] = (color, color, color, 255)
-                im.save(args.output + ".png")
+                imloc = args.output + ".png"
+                if len(args.output.split(".")) > 1:
+                    imloc = args.output
+                try:
+                    im.save(imloc)
+                    output("File saved to: " + "\\".join(sys.argv[0].split("\\")[0:-1]) + "\\" + imloc)
+                except ValueError:
+                    output("Unknown file extension: ." + imloc.split(".")[-1])
 
 
     class OneWayFunctions:
@@ -400,7 +406,7 @@ class Algorithms:
                 is_1 = data[i] != key[i]
                 if(is_1): binary_output += "1"
                 else: binary_output += "0"
-            utils.printBinaryAscii(binary_output)
+            utils.printBinaryString(binary_output)
             if args.type == file_input:
                 utils.openTempAsciiFile(binary_output)
 
@@ -474,7 +480,7 @@ def main():
         n.binaryimage()
     elif args.algorithm=="x0r":
         k.x0r()
-    elif args.algorithm=="bin":
+    elif args.algorithm=="binary":
         outp = c.binary()
         output(outp)
     elif not (args.algorithm==None):
