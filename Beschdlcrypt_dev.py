@@ -31,6 +31,26 @@ def tryimportPIL():
                 pip.main(['install', "Pillow"])
                 globals()["PIL"] = importlib.import_module("PIL")
 
+def tryimportM2Crypto():
+    try:
+        import M2Crypto
+    except ImportError:
+        tryimportPIP()
+        import pip
+        print("M2Crypto not installed, installing...")
+        try:
+            pip.main(["install", "M2Crypto"])
+        except URLError:
+            print("Failed to Establish connectiong to server, aborting!")
+            try:
+                os.system("ping -c 1 4.2.2.2")
+            except URLError:
+                print("Seems like you don't have an internet connecion please check it")
+                sys.exit()
+            print("You seem to have internet connection, but the server is not reachable, please try again later")
+        globals()["M2Crypto"] = importlib.import_module("M2Crypto")
+        from M2Crypto import RSA
+                
 ######### API Stuff
 
 listeners = []
@@ -126,10 +146,11 @@ if len(sys.argv) != 1:
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 
-version ="0.1a"
-lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32"] #MUST BE LOWERCASE
+version ="0.1.1a"
+lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_functions"]
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa (key generation, through '-a generatersakeys'"] #MUST BE LOWERCASE
 aliases =   {
+            "generatersakeys": "rsakeys",
             "hexadecimal" : "hex",
             "MessageDigest5": "md5",
             "binaryimage": "bi",
@@ -192,7 +213,7 @@ MyArgsDesc = logo
 parser = argparse.ArgumentParser(description="           xXB3schdl_CryptXx \n\n Note, that all Arguments with a double Dash ('--') don't require an aditional input, all with one dash ('-') require one.")
 
 
-
+parser.add_argument('--installrequisites', '--installprerequisites', '--instreq', '-IR', help="Install needed modules and scripts", action="store_true")
 parser.add_argument('--version', '-V', help="Shows version", action="store_true")
 parser.add_argument('--logo', '-L', help = "Shows the logo", action="store_true")
 parser.add_argument('--info', '-I', help ="Get info on the specified command", action="store_true")
@@ -204,7 +225,9 @@ parser.add_argument('-encoding', '-e',
                     help="Select the encoding")
 parser.add_argument('-list', '-l',
                     help="List possibilities of arguments")
-
+parser.add_argument('-keysize', '-bitlength', '-bitsize', '-keylength', '-ks',
+                    help=argspare.SUPPRESS,                                           #help="Input the size of the key you want to create (In Bits)",
+                    type=int)
 parser.add_argument('-algorithm', '-a',
                     help="Select the algorithm")
 
@@ -228,7 +251,8 @@ if args.type==None:
     args.type=raw_input
 if args.algorithm in aliases:
     args.algorithm = aliases[args.algorithm]
-
+if args.keysize==None and args.algorithm in  key_functions:
+    args.keysize=2048
 
 ######### Command-Line Argument Functions
 
@@ -267,6 +291,11 @@ def commandLineChecks():
     if (args.logo):
         output(logo)
         sys.exit()
+        
+    if (args.installrequisites):
+        tryimportPIP()
+        tryimportPIL()
+        tryimportM2Crypto()
 
 
     if (args.version):
@@ -440,12 +469,21 @@ class Algorithms:
                 encDecErr()
             return out
 
-
+    class Miscelanious:
+        def generateRSAKeys():
+            key = RSA.generate(2048)
+            publickey = key.publickey()
+            output("Public Key: " + publickey)
+            output("Private Key (very private): " + privatekey)
+            
+            
+            
 a = Algorithms
 n = a.NonKeyEncryptions
 o = a.OneWayFunctions
 k = a.KeyEncryptions
 c = a.Conversions
+m = a.Miscelanious
 
 ###### This is the guy that switches between the functions
 
