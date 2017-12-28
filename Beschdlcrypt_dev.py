@@ -147,7 +147,7 @@ if len(sys.argv) != 1:
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 
 version ="0.1.1a"
-lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_functions"]
+lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions"]
 algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa (key generation, through '-a generatersakeys'"] #MUST BE LOWERCASE
 aliases =   {
             "generatersakeys": "rsakeys",
@@ -163,6 +163,7 @@ aliases =   {
             algos[4]: "bi",
             algos[5]: "x0r"
             }
+key_generating_functions = ["rsa"]
 conversion_algos = ["hex", "binary"]
 non_cript_algos = ["x0r", "md5"]
 file_input_only_algos = ["bi:d"]
@@ -251,7 +252,7 @@ if args.type==None:
     args.type=raw_input
 if args.algorithm in aliases:
     args.algorithm = aliases[args.algorithm]
-if args.keysize==None and args.algorithm in  key_functions:
+if args.keysize==None and args.algorithm in  key_generating_functions:
     args.keysize=2048
 
 ######### Command-Line Argument Functions
@@ -272,6 +273,11 @@ def commandLineChecks():
         for Temp in encodings:
             output(" - ", Temp)
         output("\nThese are not the only encodings, you can choose others, that are supported")
+        sys.exit()
+    elif args.list=="key_generating_functions":
+        output("   Availabe key generating functions:\n")
+        for Temp in key_generating_functions:
+            output(" - ", Temp)
         sys.exit()
     elif args.list=="lists":
         output("   Availabe lists\n")
