@@ -39,7 +39,7 @@ def tryimportM2Crypto():
         import pip
         print("M2Crypto not installed, installing...")
         try:
-            pip.main(["install", "M2Crypto"])
+            pip.main(["install", "M2CryptoWin64"])
         except URLError:
             print("Failed to Establish connectiong to server, aborting!")
             try:
