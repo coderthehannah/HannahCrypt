@@ -143,6 +143,7 @@ aliases =   {
             algos[4]: "bi",
             algos[5]: "x0r"
             }
+conversion_algos = ["hex", "binary"]
 non_cript_algos = ["x0r", "md5"]
 file_input_only_algos = ["bi:d"]
 require_keys_algos = ["x0r"]
