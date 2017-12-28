@@ -226,7 +226,7 @@ parser.add_argument('-encoding', '-e',
 parser.add_argument('-list', '-l',
                     help="List possibilities of arguments")
 parser.add_argument('-keysize', '-bitlength', '-bitsize', '-keylength', '-ks',
-                    help=argspare.SUPPRESS,                                           #help="Input the size of the key you want to create (In Bits)",
+                    help=argparse.SUPPRESS,                                           #help="Input the size of the key you want to create (In Bits)",
                     type=int)
 parser.add_argument('-algorithm', '-a',
                     help="Select the algorithm")
