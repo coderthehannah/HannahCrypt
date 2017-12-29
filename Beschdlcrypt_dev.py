@@ -1,5 +1,6 @@
 import sys
 import argparse
+import os
 import binascii
 import hashlib
 h = hashlib
@@ -11,35 +12,33 @@ from base64 import b64decode, b64encode
 from binascii import a2b_hex
 from base64 import b32decode, b32encode
 
-def tryimportPIP():
-    try:
-        import pip
-    except ImportError:
-        output("Pip not installed. Installing")
-        try:
-            exec(pip_install_script = urllib.request.urlopen("https://bootstrap.pypa.io/get-pip.py").read())
-        except URLError:
-            output("Unable to connect to server")
+#Installing Pip cant be in a function. Dont know why -Wyn
+oldargs = sys.argv
+sys.argv = [sys.argv[0]]
+try:
+    import pip
+except ImportError:
+    print("Pip not installed. Installing. The Program will have to restart")
+    exec(urllib.request.urlopen("https://bootstrap.pypa.io/get-pip.py").read().decode("utf-8"))
+sys.argv = oldargs
 
 def tryimportPIL():
-            try:
-                import PIL
-            except ImportError:
-                import pip
-                tryimportPIP()
-                output("Pillow not installed. Installing")
-                pip.main(['install', "Pillow"])
-                globals()["PIL"] = importlib.import_module("PIL")
+    try:
+        import PIL
+    except ImportError:
+        import pip
+        output("Pillow not installed. Installing")
+        pip.main(['install', "Pillow"])
+        globals()["PIL"] = importlib.import_module("PIL")
 
 def tryimportM2Crypto():
     try:
         import M2Crypto
     except ImportError:
-        tryimportPIP()
         import pip
         print("M2Crypto not installed, installing...")
         try:
-            pip.main(["install", "M2CryptoWin64"])
+            pip.main(["install", "-egg", "M2CryptoWin32"])
         except URLError:
             print("Failed to Establish connectiong to server, aborting!")
             try:
@@ -50,7 +49,6 @@ def tryimportM2Crypto():
             print("You seem to have internet connection, but the server is not reachable, please try again later")
         globals()["M2Crypto"] = importlib.import_module("M2Crypto")
         from M2Crypto import RSA
-                
 ######### API Stuff
 
 listeners = []
@@ -145,7 +143,7 @@ if len(sys.argv) != 1:
 
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
-
+modules = ["PIL", "pip", "M2Crypto"]
 version ="0.1.1a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions"]
 algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa (key generation, through '-a generatersakeys'"] #MUST BE LOWERCASE
@@ -259,9 +257,14 @@ if args.keysize==None and args.algorithm in  key_generating_functions:
 
 #Cant print anything if sys args are empty, as importing the file as an API will also run it
 
+def imports():
+    tryimportPIL()
+    tryimportM2Crypto()
 
 def commandLineChecks():
 
+    if (args.installrequisites):
+        imports()
 
     if args.list=="Algorithms" or args.list=="algos":
         output("   Availabe algorithms:\n")
@@ -297,12 +300,6 @@ def commandLineChecks():
     if (args.logo):
         output(logo)
         sys.exit()
-        
-    if (args.installrequisites):
-        tryimportPIP()
-        tryimportPIL()
-        tryimportM2Crypto()
-
 
     if (args.version):
         output(logo)
@@ -481,9 +478,9 @@ class Algorithms:
             publickey = key.publickey()
             output("Public Key: " + publickey)
             output("Private Key (very private): " + privatekey)
-            
-            
-            
+
+
+
 a = Algorithms
 n = a.NonKeyEncryptions
 o = a.OneWayFunctions
@@ -529,7 +526,6 @@ def main():
         output(outp)
     elif not (args.algorithm==None):
         output("Your algorithm is not valid, get a list of algorithms with 'Beschdlcrypt.py -list algorithms'; Did you type it wrong?")
-
 
 if(len(sys.argv) != 1):
     commandLineChecks()
