@@ -31,14 +31,14 @@ def tryimportPIL():
         pip.main(['install', "Pillow"])
         globals()["PIL"] = importlib.import_module("PIL")
 
-def tryimportM2Crypto():
+def tryimportcryptography():
     try:
-        import M2Crypto
+        import cryptography.fernet
     except ImportError:
         import pip
-        print("M2Crypto not installed, installing...")
+        print("cryptography not installed, installing...")
         try:
-            pip.main(["install", "-egg", "M2CryptoWin32"])
+            pip.main(["install", "cryptography"])
         except URLError:
             print("Failed to Establish connectiong to server, aborting!")
             try:
@@ -47,8 +47,8 @@ def tryimportM2Crypto():
                 print("Seems like you don't have an internet connecion please check it")
                 sys.exit()
             print("You seem to have internet connection, but the server is not reachable, please try again later")
-        globals()["M2Crypto"] = importlib.import_module("M2Crypto")
-        from M2Crypto import RSA
+        globals()["cryptography"] = importlib.import_module("cryptography")
+        from cryptography.fernet import Fernet
 ######### API Stuff
 
 listeners = []
@@ -143,7 +143,7 @@ if len(sys.argv) != 1:
 
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
-modules = ["PIL", "pip", "M2Crypto"]
+modules = ["PIL", "pip", "cryptography"]
 version ="0.1.1a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions"]
 algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa (key generation, through '-a generatersakeys'"] #MUST BE LOWERCASE
@@ -259,7 +259,7 @@ if args.keysize==None and args.algorithm in  key_generating_functions:
 
 def imports():
     tryimportPIL()
-    tryimportM2Crypto()
+    tryimportcryptography()
 
 def commandLineChecks():
 
