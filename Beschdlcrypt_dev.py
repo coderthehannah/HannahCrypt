@@ -1,3 +1,4 @@
+print("\nDevelopement Version")
 import sys
 import argparse
 import os
@@ -33,7 +34,11 @@ def tryimportPIL():
 
 def tryimportcryptography():
     try:
-        import cryptography.fernet
+        from cryptography.fernet import Fernet
+        from cryptography.hazmat.primitives.asymmetric import rsa
+        from cryptography.hazmat.primitives import serialization as crypto_serialization
+        from cryptography.hazmat.backends import default_backend as crypto_default_backend
+
     except ImportError:
         import pip
         print("cryptography not installed, installing...")
@@ -49,6 +54,10 @@ def tryimportcryptography():
             print("You seem to have internet connection, but the server is not reachable, please try again later")
         globals()["cryptography"] = importlib.import_module("cryptography")
         from cryptography.fernet import Fernet
+        from cryptography.hazmat.primitives.asymmetric import rsa
+        from cryptography.hazmat.primitives import serialization as crypto_serialization
+        from cryptography.hazmat.backends import default_backend as crypto_default_backend
+
 ######### API Stuff
 
 listeners = []
@@ -144,7 +153,7 @@ if len(sys.argv) != 1:
 
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 modules = ["PIL", "pip", "cryptography"]
-version ="0.1.1a"
+version ="0.1.2a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions"]
 algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa (key generation, through '-a generatersakeys'"] #MUST BE LOWERCASE
 aliases =   {
@@ -193,13 +202,13 @@ def checkEncDec():
     if (args.encrypt) and (args.decrypt):
         output("ERROR: Please select either encryption or decryption method")
         sys.exit()
-    if (args.encrypt==0) and (args.decrypt==0) and not (args.input==None) and not (args.version) and not (args.logo) and (args.list==None) and not args.algorithm in non_cript_algos:
+    if (args.encrypt==0) and (args.decrypt==0) and not (args.input==None) and not (args.version) and not (args.logo) and (args.list==None) and not args.algorithm in non_cript_algos and not args.algorithm in key_generating_functions:
         output("Please specify if you want to encrypt or decrypt ('--encrypt/--decrypt' or '-E/-D')")
         sys.exit()
     output("\n")
 
 def checkInput():
-    if args.input == None or len(args.input) == 0:
+    if (args.input==None or len(args.input)==0) and not args.algorithm in key_generating_functions:
         output("Please specify an input with -i")
         sys.exit()
 
@@ -474,14 +483,32 @@ class Algorithms:
             return out
 
     class Miscelanious:
-        def generateRSAKeys():
-            key = RSA.generate(2048)
-            publickey = key.publickey()
-            output("Public Key: " + publickey)
-            output("Private Key (very private): " + privatekey)
+        def rsa():
+            tryimportcryptography()
+            from cryptography.hazmat.primitives import serialization as crypto_serialization
+            from cryptography.hazmat.primitives.asymmetric import rsa
+            from cryptography.hazmat.backends import default_backend as crypto_default_backend
+            key = rsa.generate_private_key(
+                backend=crypto_default_backend(),
+                public_exponent=65537,
+                key_size=args.keysize
+            )
+    
+            output("Your private key is (very private):")
+            private_key = key.private_bytes(
+            crypto_serialization.Encoding.PEM,
+                crypto_serialization.PrivateFormat.PKCS8, 
+                crypto_serialization.NoEncryption())
+            output(private_key.decode(args.encoding))
+            output("\n\n\n")
+            output("Your public key is:\n")
+            public_key = key.public_key().public_bytes(
+                crypto_serialization.Encoding.OpenSSH, 
+                crypto_serialization.PublicFormat.OpenSSH)
+            output(public_key.decode(args.encoding).replace('ssh-rsa ', ''))
 
 
-
+        
 a = Algorithms
 n = a.NonKeyEncryptions
 o = a.OneWayFunctions
@@ -522,6 +549,8 @@ def main():
         n.binaryimage()
     elif args.algorithm=="x0r":
         k.x0r()
+    elif args.algorithm=="rsa":
+        m.rsa()
     elif args.algorithm=="binary":
         outp = c.binary()
         output(outp)
