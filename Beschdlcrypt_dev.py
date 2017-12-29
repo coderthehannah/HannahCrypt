@@ -1,4 +1,4 @@
-print("\nDevelopement Version")
+
 import sys
 import argparse
 import os
