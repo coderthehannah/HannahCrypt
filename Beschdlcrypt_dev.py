@@ -260,7 +260,8 @@ if args.keysize==None and args.algorithm in  key_generating_functions:
 def imports():
     tryimportPIL()
     tryimportcryptography()
-
+    sys.exit()
+    
 def commandLineChecks():
 
     if (args.installrequisites):
