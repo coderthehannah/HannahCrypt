@@ -3,6 +3,7 @@ from tkinter import *
 import sys
 import os
 import math
+import importlib
 
 version = "0.0.1"
 
@@ -84,14 +85,14 @@ def setConvertOutput(output):
 
 def convert():
     inp = ""
-    if _convert_input.get() == "binary":
+    if _convert_input.get() == "Binary":
         for char in conversion_input[0].get("1.0","end")[0:-1]:
             if char not in ["0", "1", " ", "\n"]:
                 setConvertOutput("Malformed Input! '" + char + "' is not a binary character")
                 return;
             elif char != " " and char != "\n":
                 inp += char
-    elif _convert_input.get() == "hex":
+    elif _convert_input.get() == "Hex":
         for char in conversion_input[0].get("1.0","end")[0:-1]:
             if char not in list("0123456789ABCDEF \n"):
                 setConvertOutput("Malformed Input! '" + char + "' is not a hex character")
@@ -113,10 +114,9 @@ def convert():
             for i in range(8 - len(bin_char)):
                 inp += "0"
             inp += bin_char
-
-    if _convert_output.get() == "binary":
+    if _convert_output.get() == "Binary":
         setConvertOutput(inp)
-    elif _convert_output.get() == "hex":
+    elif _convert_output.get() == "Hex":
         setConvertOutput("".join(hex(int(inp, 2)).upper().split("0X")))
     else:
         out = ""
@@ -168,6 +168,10 @@ conversion_list = ["Text"]
 for algo in parent.conversion_algos:
     conversion_list.append(str(algo).capitalize())
 
+def importMods():
+    import pip
+    pip.main(["install", "cryptography"])
+
 mainscreen = OptionMenu(master, _type, *algolist), 0.4, 0.1, 0.2, 0.1
 en_sel = Radiobutton(master, text = "Encrypt", variable=_en, value=0), 0.7, 0.4, 0.1, 0.05
 de_sel = Radiobutton(master, text = "Decrypt", variable=_en, value=1), 0.7, 0.45, 0.1, 0.05
@@ -188,13 +192,19 @@ conversion_input_type = OptionMenu(master, _convert_input, *conversion_list), 0.
 conversion_output_type = OptionMenu(master, _convert_output, *conversion_list), 0.752, 0.3, 0.2, 0.1
 conversion_input_encoding = OptionMenu(master, _convert_encoding_input, *parent.encodings), 0.252, 0.3, 0.2, 0.1
 conversion_output_encoding = OptionMenu(master, _convert_encoding_ouput, *parent.encodings), 0.548, 0.3, 0.2, 0.1
-
+missing_mods = Button(master, text = "You are missing some modules\nClick here to attempt installation", command = importMods), 0.05, 0.8, 0.2, 0.1
 _copyright = Label(master, text = version + "\nWyn Price 2017", bg = "#FFFFFF"), 0.87, 0.9, 0.15, 0.1
 
 output_box = Text(master), 0.1, 0.05, 0.8, 0.7
 output_back = Button(master, text = "back", command = toggleOutIn), 0.4, 0.8, 0.2, 0.1
 def update():
     componants = [_copyright]
+    for mod in parent.modules:
+        try:
+            importlib.import_module(mod)
+        except ImportError:
+            componants.append(missing_mods)
+            break;
     if _type.get().lower() in parent.aliases:
         _type.set(parent.aliases[_type.get().lower()].capitalize())
     master.after(50, update)

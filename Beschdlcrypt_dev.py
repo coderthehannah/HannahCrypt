@@ -28,7 +28,7 @@ def tryimportPIL():
         import PIL
     except ImportError:
         import pip
-        output("Pillow not installed. Installing")
+        print("Pillow not installed. Installing")
         pip.main(['install', "Pillow"])
         globals()["PIL"] = importlib.import_module("PIL")
 
@@ -38,7 +38,7 @@ def tryimportcryptography():
         from cryptography.hazmat.primitives.asymmetric import rsa
         from cryptography.hazmat.primitives import serialization as crypto_serialization
         from cryptography.hazmat.backends import default_backend as crypto_default_backend
-
+        print(rsa)
     except ImportError:
         import pip
         print("cryptography not installed, installing...")
@@ -155,7 +155,7 @@ logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /       
 modules = ["PIL", "pip", "cryptography"]
 version ="0.1.2a"
 lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions"]
-algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa (key generation, through '-a generatersakeys'"] #MUST BE LOWERCASE
+algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa"] #MUST BE LOWERCASE
 aliases =   {
             "generatersakeys": "rsakeys",
             "hexadecimal" : "hex",
@@ -168,7 +168,8 @@ aliases =   {
             ###USED FOR API
             algos[2]: "hex",
             algos[4]: "bi",
-            algos[5]: "x0r"
+            algos[5]: "x0r",
+
             }
 key_generating_functions = ["rsa"]
 conversion_algos = ["hex", "binary"]
@@ -270,7 +271,7 @@ def imports():
     tryimportPIL()
     tryimportcryptography()
     sys.exit()
-    
+
 def commandLineChecks():
 
     if (args.installrequisites):
@@ -493,22 +494,22 @@ class Algorithms:
                 public_exponent=65537,
                 key_size=args.keysize
             )
-    
+
             output("Your private key is (very private):")
             private_key = key.private_bytes(
             crypto_serialization.Encoding.PEM,
-                crypto_serialization.PrivateFormat.PKCS8, 
+                crypto_serialization.PrivateFormat.PKCS8,
                 crypto_serialization.NoEncryption())
             output(private_key.decode(args.encoding))
             output("\n\n\n")
             output("Your public key is:\n")
             public_key = key.public_key().public_bytes(
-                crypto_serialization.Encoding.OpenSSH, 
+                crypto_serialization.Encoding.OpenSSH,
                 crypto_serialization.PublicFormat.OpenSSH)
             output(public_key.decode(args.encoding).replace('ssh-rsa ', ''))
 
 
-        
+
 a = Algorithms
 n = a.NonKeyEncryptions
 o = a.OneWayFunctions
