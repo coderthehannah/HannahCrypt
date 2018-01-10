@@ -3,10 +3,7 @@ Beschdlcrypt is a collection of software especially made for cryptography by me,
 
 So, the software I'm developing right now is a collection of "Open-Source" Encryption-Algorithms.
 Some of them are just hexadecimal or similar. Which means, that the text is just translated in a different coding, nothing more.
-So, the current program consists of 3 Algorithms:
- -Base64
- -Base32
- -Hexadecimal
+So, the current program consists of about 15 Algorithms, including hash algorithms, key encryptions and more.
 I am working on different stuff, I always upload a "Todo" on pastebin.com, this is the link: https://pastebin.com/u/Beschdl
 
 The program is completely programmed with python, some of the code is just imported from a module, e.g. The SHA algorithms.
