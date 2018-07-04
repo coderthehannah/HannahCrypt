@@ -5,6 +5,8 @@ import os
 import binascii
 import hashlib
 h = hashlib
+from Crypto import Random
+from Crypto.Cipher import AES
 import math
 import importlib
 import urllib.request
@@ -57,7 +59,12 @@ def tryimportcryptography():
         from cryptography.hazmat.primitives.asymmetric import rsa
         from cryptography.hazmat.primitives import serialization as crypto_serialization
         from cryptography.hazmat.backends import default_backend as crypto_default_backend
-
+        
+def tryimportlibraries():
+    print()
+    pip.main(['install', "Crypto"])
+        
+        
 ######### API Stuff
 
 listeners = []
@@ -154,7 +161,7 @@ if len(sys.argv) != 1:
 logo ="\n  _______\n <	 \ \n < 	  \          ________ \n < 	  /         /        \ \n <	  \        /     ____/ \n <	   \      <     / \n <         /      <     \____\n <	  /        \         \ \n <_______/   <>     \________/ <>	\n\n"
 modules = ["PIL", "pip", "cryptography"]
 version ="0.1.2a"
-lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions"]
+lists = ["algos/algorithms", "non_cript_algos", "lists", "encodings", "key_generating_functionsfunctions", "one_way_functions"]
 algos = ["base64", "base32", "hex (hexadecimal)", "md5", "bi (binaryimage)", "x0r / xor", "binary", "sha256", "sha1", "sha512", "crc32", "rsa"] #MUST BE LOWERCASE
 aliases =   {
             "generatersakeys": "rsakeys",
@@ -171,6 +178,7 @@ aliases =   {
             algos[5]: "x0r",
 
             }
+one_way_functions = ["sha256", "sha512", "sha1", "crc32", "md5"]
 key_generating_functions = ["rsa"]
 conversion_algos = ["hex", "binary"]
 non_cript_algos = ["x0r", "md5"]
@@ -270,6 +278,7 @@ if args.keysize==None and args.algorithm in  key_generating_functions:
 def imports():
     tryimportPIL()
     tryimportcryptography()
+    trygetlibraries()
     sys.exit()
 
 def commandLineChecks():
