@@ -60,7 +60,7 @@ def tryimportcryptography():
         from cryptography.hazmat.primitives import serialization as crypto_serialization
         from cryptography.hazmat.backends import default_backend as crypto_default_backend
         
-def tryimportlibraries():
+def tryGetLibraries():
     print()
     pip.main(['install', "Crypto"])
         
@@ -278,7 +278,7 @@ if args.keysize==None and args.algorithm in  key_generating_functions:
 def imports():
     tryimportPIL()
     tryimportcryptography()
-    trygetlibraries()
+    tryGetLibraries()
     sys.exit()
 
 def commandLineChecks():
