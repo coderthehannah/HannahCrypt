@@ -5,8 +5,6 @@ import os
 import binascii
 import hashlib
 h = hashlib
-from Crypto import Random
-from Crypto.Cipher import AES
 import math
 import importlib
 import urllib.request
@@ -18,6 +16,7 @@ from base64 import b32decode, b32encode
 #Installing Pip cant be in a function. Dont know why -Wyn
 oldargs = sys.argv
 sys.argv = [sys.argv[0]]
+
 try:
     import pip
 except ImportError:
@@ -61,8 +60,14 @@ def tryimportcryptography():
         from cryptography.hazmat.backends import default_backend as crypto_default_backend
         
 def tryGetLibraries():
-    print()
-    pip.main(['install', "Crypto"])
+    try:
+        from Crypto import Random
+        from Crypto.Cipher import AES
+    except ImportError:
+        print("Detected missing libraries, installing...")
+        pip.main(['install', "Crypto"])
+    else:
+        print("Everything important is already installed")
         
         
 ######### API Stuff
@@ -526,11 +531,19 @@ k = a.KeyEncryptions
 c = a.Conversions
 m = a.Miscelanious
 
+
+
+def import():
+    print()
+    from Crypto import Random
+    from Crypto.Cipher import AES
+
 ###### This is the guy that switches between the functions
 
 
 
 def main():
+    import()
     if args.algorithm not in file_input_only_algos:
         try:
             args.input = open(args.input, "r").read()
