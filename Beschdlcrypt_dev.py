@@ -284,7 +284,8 @@ def imports():
     tryimportPIL()
     tryimportcryptography()
     tryGetLibraries()
-    sys.exit()
+    from Crypto import Random
+    from Crypto.Cipher import AES
 
 def commandLineChecks():
 
@@ -532,18 +533,12 @@ c = a.Conversions
 m = a.Miscelanious
 
 
-
-def import():
-    print()
-    from Crypto import Random
-    from Crypto.Cipher import AES
-
 ###### This is the guy that switches between the functions
 
 
 
 def main():
-    import()
+    imports()
     if args.algorithm not in file_input_only_algos:
         try:
             args.input = open(args.input, "r").read()
