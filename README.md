@@ -12,3 +12,4 @@ Yeah, the logo is self made, yes, it is horrible, and yeah, it is difficult to p
 Thanks for reading all of this, thanks for the support (If you even do, if you don't, do), and yeah... cya
 
 PS: I'm 14, so help and constructive critic is always appreciated.
+PPS: I'm 19 now holy shit time flies wtf
