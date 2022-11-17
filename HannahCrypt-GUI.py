@@ -8,7 +8,7 @@ import importlib
 version = "0.0.1"
 
 try:
-    import Beschdlcrypt_dev
+    import HannahCrypt_dev
 except ImportError:
     print("Main script not found. Aborting!")
     sys.exit()
