@@ -1,9 +1,8 @@
 import sys
-import argparse
 import os
+import argparse
 import binascii
-import hashlib
-h = hashlib
+import hashlib as h
 import math
 import importlib
 import urllib.request
@@ -44,11 +43,11 @@ def tryimportcryptography():
         print("cryptography not installed, installing...")
         try:
             pip.main(["install", "cryptography"])
-        except URLError:
+        except OSError:
             print("Failed to Establish connectiong to server, aborting!")
             try:
                 os.system("ping -c 1 4.2.2.2")
-            except URLError:
+            except OSError:
                 print("Seems like you don't have an internet connecion please check it")
                 sys.exit()
             print("You seem to have internet connection, but the server is not reachable, please try again later")
@@ -327,10 +326,7 @@ def commandLineChecks():
         sys.exit()
 
     if (args.version):
-        output(logo)
-        output("\n")
-        output("The actual Version is: ")
-        output(version)
+        print("{}\nThe actual Version is: {}".format(logo, version))
         sys.exit()
     checkEncDec()
     checkInput()
@@ -489,7 +485,7 @@ class Algorithms:
                 out = utils.getBinaryFromString(args.input)
             elif (args.decrypt):
                 for char in args.input:
-                    if char not in ["0", "1", " "]:
+                    if char not in "01 ":
                         output("You need to give a valid binary input\n")
                         sys.exit()
                 out = utils.getStringFromBinary(args.input)
